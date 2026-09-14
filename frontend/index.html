@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#071a1f" />
+  <title>StressMitra | Personnel Welfare Intelligence</title>
+  <style>
+    :root {
+      --ink:#e9f7f5; --muted:#93aaa9; --line:rgba(196,237,230,.11); --line-strong:rgba(196,237,230,.18);
+      --bg:#071417; --surface:#0c2024; --surface-2:#10292d; --surface-3:#15353a; --paper:#eaf5ed;
+      --teal:#49e1bd; --teal-dark:#0f7b6b; --cyan:#76d7ff; --yellow:#ffd772; --orange:#ff9d65; --red:#ff727b;
+      --shadow:0 20px 50px rgba(0,0,0,.24); --radius:18px; --font:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-width:320px; font-family:var(--font); color:var(--ink); background:var(--bg); overflow-x:hidden; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:2px solid var(--teal); outline-offset:3px; }
+    .app-shell { min-height:100vh; display:grid; grid-template-columns:248px minmax(0,1fr); background:radial-gradient(circle at 66% -12%,#174247 0,transparent 31rem),linear-gradient(130deg,#071417 0%,#061619 45%,#0b2023 100%); }
+    .sidebar { position:sticky; top:0; height:100vh; padding:28px 16px 18px; border-right:1px solid var(--line); display:flex; flex-direction:column; background:rgba(4,17,19,.68); backdrop-filter:blur(20px); z-index:20; }
+    .brand { display:flex; align-items:center; gap:11px; padding:0 10px 29px; border-bottom:1px solid var(--line); }
+    .force-emblem { position:relative; display:grid; place-items:center; width:42px; height:46px; color:#f7e9a8; filter:drop-shadow(0 5px 9px rgba(0,0,0,.25)); }
+    .force-emblem svg { width:42px; height:46px; overflow:visible; }
+    .brand-title { font-weight:800; letter-spacing:.08em; font-size:13px; }
+    .brand-title small { display:block; margin-top:3px; color:var(--muted); letter-spacing:.13em; font-size:7px; font-weight:800; }
+    .brand-title em { color:#f2d67e; font-style:normal; }
+    .nav { display:flex; flex-direction:column; gap:5px; margin-top:25px; }
+    .nav-label { color:#6b8584; margin:0 10px 8px; text-transform:uppercase; letter-spacing:.13em; font-size:9px; font-weight:800; }
+    .nav-item { border:0; border-radius:11px; display:flex; align-items:center; gap:12px; color:#a7c0be; background:transparent; padding:10px 11px; text-align:left; font-size:13px; transition:.18s ease; }
+    .nav-item svg { width:17px; height:17px; stroke-width:1.8; flex:none; }
+    .nav-item:hover { background:rgba(111,206,188,.07); color:var(--ink); }
+    .nav-item.active { color:#071b19; background:var(--teal); font-weight:750; box-shadow:0 9px 24px rgba(45,214,179,.13); }
+    .nav-badge { margin-left:auto; padding:2px 6px; border-radius:20px; color:#4cffd4; background:rgba(69,225,189,.14); font-size:10px; font-weight:800; }
+    .nav-item.active .nav-badge { color:#073a34; background:rgba(7,58,52,.13); }
+    .sidebar-bottom { margin-top:auto; }
+    .privacy-card { padding:14px; border:1px solid var(--line); border-radius:13px; background:linear-gradient(135deg,rgba(61,167,147,.12),rgba(61,167,147,.025)); }
+    .privacy-card svg { width:18px; height:18px; color:var(--teal); }
+    .privacy-card strong { display:block; margin-top:7px; font-size:11px; }
+    .privacy-card p { margin:4px 0 0; color:var(--muted); line-height:1.45; font-size:10px; }
+    .operator { display:flex; align-items:center; gap:10px; padding:17px 8px 1px; }
+    .avatar { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; color:#def9f4; background:linear-gradient(135deg,#745b9c,#2e7490); font-size:10px; font-weight:850; letter-spacing:.04em; }
+    .operator span { display:block; font-size:11px; font-weight:700; }
+    .operator small { color:var(--muted); font-size:9px; }
+    main { padding:26px clamp(18px,3vw,45px) 44px; min-width:0; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:27px; }
+    .topbar-left { display:flex; align-items:center; gap:14px; }
+    .menu-button { display:none; }
+    .crumb { color:var(--muted); font-size:11px; }
+    .crumb strong { color:var(--ink); font-weight:700; }
+    .live-state { display:flex; align-items:center; gap:7px; color:#8eb7ae; text-transform:uppercase; letter-spacing:.11em; font-size:9px; font-weight:800; }
+    .pulse { width:7px; height:7px; background:var(--teal); border-radius:50%; box-shadow:0 0 0 0 rgba(73,225,189,.6); animation:pulse 1.8s infinite; }
+    @keyframes pulse { 70%{box-shadow:0 0 0 7px rgba(73,225,189,0)} 100%{box-shadow:0 0 0 0 rgba(73,225,189,0)} }
+    .top-actions { display:flex; align-items:center; gap:9px; }
+    .icon-button { width:35px; height:35px; display:grid; place-items:center; position:relative; color:#c4e6e0; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.025); }
+    .icon-button:hover { border-color:rgba(73,225,189,.4); background:rgba(73,225,189,.08); }
+    .icon-button svg { width:17px; height:17px; }
+    .tiny-dot { position:absolute; width:6px; height:6px; right:8px; top:7px; border:1px solid var(--bg); border-radius:50%; background:var(--orange); }
+    .header-intro { display:flex; justify-content:space-between; gap:20px; align-items:end; margin-bottom:21px; }
+    .eyebrow { margin:0 0 7px; color:var(--teal); text-transform:uppercase; letter-spacing:.14em; font-size:10px; font-weight:850; }
+    h1 { margin:0; max-width:720px; font-size:clamp(27px,3vw,39px); line-height:1.08; letter-spacing:-.045em; font-weight:720; }
+    .heading-sub { max-width:520px; margin:10px 0 0; color:#a8c1be; line-height:1.55; font-size:13px; }
+    .date-block { padding-bottom:4px; text-align:right; color:var(--muted); font-size:10px; line-height:1.5; white-space:nowrap; }
+    .date-block strong { display:block; color:var(--ink); font-size:12px; }
+    .tab-view { display:none; animation:appear .3s ease; }
+    .tab-view.active { display:block; }
+    @keyframes appear { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:none} }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin-bottom:16px; }
+    .metric { min-height:112px; padding:16px; position:relative; overflow:hidden; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(145deg,rgba(24,54,57,.76),rgba(9,30,34,.72)); box-shadow:var(--shadow); }
+    .metric::after { content:""; position:absolute; width:80px; height:80px; right:-27px; bottom:-35px; border-radius:50%; background:radial-gradient(circle,rgba(73,225,189,.13),transparent 70%); }
+    .metric-label { color:#9cb5b2; font-size:10px; font-weight:680; }
+    .metric-value { display:flex; align-items:baseline; gap:5px; margin-top:12px; font-size:29px; line-height:.9; letter-spacing:-.045em; font-weight:720; }
+    .metric-value small { color:#8ea8a5; font-size:11px; font-weight:650; letter-spacing:0; }
+    .metric-note { margin-top:9px; color:#77a69d; font-size:10px; }
+    .metric-note.warn { color:#f3bf69; }
+    .metric-note strong { font-weight:800; }
+    .dashboard-grid { display:grid; grid-template-columns:minmax(0,1.42fr) minmax(280px,.79fr); gap:16px; }
+    .panel { min-width:0; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(145deg,rgba(15,43,47,.88),rgba(8,27,31,.88)); box-shadow:var(--shadow); }
+    .panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:18px 19px 0; }
+    .panel-kicker { margin:0; color:var(--muted); font-size:10px; font-weight:650; }
+    .panel-title { margin:4px 0 0; font-size:14px; font-weight:710; letter-spacing:-.015em; }
+    .panel-action { padding:0; color:var(--teal); border:0; background:transparent; font-size:10px; font-weight:750; }
+    .panel-action:hover { text-decoration:underline; }
+    .trend-panel { min-height:315px; }
+    .trend-summary { display:flex; justify-content:space-between; align-items:end; padding:18px 19px 0; }
+    .trend-main { font-size:32px; letter-spacing:-.05em; font-weight:730; }
+    .trend-main span { color:#90aaa6; font-size:11px; font-weight:600; letter-spacing:0; }
+    .trend-caption { margin-top:4px; color:#83a09d; font-size:10px; }
+    .legend { display:flex; gap:10px; color:#93aaa8; font-size:9px; }
+    .legend span { display:flex; align-items:center; gap:4px; }
+    .legend i { width:14px; height:2px; background:var(--teal); }
+    .legend i.b { background:var(--yellow); }
+    .chart-wrap { height:180px; padding:9px 15px 14px 8px; }
+    #stressChart { width:100%; height:100%; overflow:visible; }
+    .chart-grid { stroke:rgba(191,233,226,.08); stroke-width:1; }
+    .chart-label { fill:#789390; font-size:9px; font-family:var(--font); }
+    .area { fill:url(#chartFill); opacity:.72; }
+    .chart-line { fill:none; stroke:var(--teal); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 4px 4px rgba(73,225,189,.25)); }
+    .threshold { fill:none; stroke:var(--yellow); stroke-width:1; stroke-dasharray:3 4; opacity:.86; }
+    .point { fill:#d2fff4; stroke:var(--teal); stroke-width:2.5; }
+    .chart-tag { fill:#06201e; stroke:rgba(73,225,189,.55); }
+    .chart-tag-text { fill:#aaffe7; font-size:9px; font-family:var(--font); font-weight:800; }
+    .brief-panel { padding-bottom:13px; }
+    .brief-items { padding:11px 12px 0; }
+    .brief-item { display:grid; grid-template-columns:30px 1fr auto; align-items:center; gap:10px; padding:12px 7px; border-bottom:1px solid var(--line); }
+    .brief-item:last-child { border-bottom:0; }
+    .brief-icon { display:grid; place-items:center; width:29px; height:29px; border-radius:9px; background:rgba(73,225,189,.09); color:var(--teal); }
+    .brief-icon svg { width:15px; height:15px; }
+    .brief-item strong { display:block; font-size:11px; font-weight:680; }
+    .brief-item p { max-width:210px; margin:3px 0 0; color:#8aa5a1; font-size:9px; line-height:1.4; }
+    .brief-item time { color:#6e8986; font-size:9px; }
+    .rows-grid { display:grid; grid-template-columns:minmax(0,1.42fr) minmax(280px,.79fr); gap:16px; margin-top:16px; }
+    .analytic-row { display:grid; grid-template-columns:1fr 1fr 1.13fr; gap:16px; margin-top:16px; }
+    .analytic-panel { min-height:210px; }
+    .risk-donut-wrap { display:flex; align-items:center; justify-content:center; gap:17px; padding:16px 17px 5px; }
+    .risk-donut { display:grid; place-items:center; position:relative; width:108px; height:108px; border-radius:50%; background:conic-gradient(var(--teal) 0deg 210deg,var(--yellow) 210deg 300deg,var(--orange) 300deg 360deg); }
+    .risk-donut::after { content:""; position:absolute; inset:11px; border-radius:50%; background:var(--surface); }
+    .risk-donut strong,.risk-donut span { z-index:1; text-align:center; }
+    .risk-donut strong { margin-top:4px; font-size:23px; letter-spacing:-.06em; }
+    .risk-donut span { position:absolute; bottom:28px; color:#86a19d; font-size:8px; }
+    .dist-legend { display:grid; gap:11px; min-width:103px; }
+    .dist-legend div { display:flex; align-items:center; justify-content:space-between; gap:13px; color:#a9c2be; font-size:10px; }
+    .dist-legend i { display:inline-block; width:7px; height:7px; margin-right:6px; border-radius:50%; background:var(--teal); }
+    .dist-legend i.watch { background:var(--yellow); }.dist-legend i.follow { background:var(--orange); }
+    .dist-legend b { color:#e8f8f3; font-variant-numeric:tabular-nums; }
+    .unit-bars { display:grid; gap:15px; padding:22px 19px 14px; }
+    .unit-row { display:grid; grid-template-columns:52px 1fr 31px; align-items:center; gap:9px; color:#a9c0bd; font-size:10px; }
+    .unit-row b { color:#e5f6f1; text-align:right; font-size:10px; }
+    .unit-track { height:8px; overflow:hidden; border-radius:10px; background:rgba(229,251,246,.1); }
+    .unit-track i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#3bbd9f,var(--teal)); }
+    .unit-row:nth-child(2) .unit-track i { background:linear-gradient(90deg,#d6a851,var(--yellow)); }.unit-row:nth-child(3) .unit-track i { background:linear-gradient(90deg,#3a8b8a,#76d7ff); }
+    .driver-layout { display:grid; grid-template-columns:93px 1fr; align-items:center; gap:15px; padding:19px; }
+    .driver-shield { position:relative; width:83px; height:93px; display:grid; place-items:center; color:#f3d776; background:linear-gradient(145deg,#24615b,#0a292c); clip-path:polygon(50% 0,92% 17%,86% 70%,50% 100%,14% 70%,8% 17%); }
+    .driver-shield::before { content:"AI"; display:grid; place-items:center; width:49px; height:49px; color:#093532; border:1px solid rgba(247,233,168,.55); border-radius:50%; background:#f3d776; font-size:12px; font-weight:900; letter-spacing:.06em; }
+    .driver-shield::after { content:"ADVISORY"; position:absolute; bottom:12px; color:#d5f2df; font-size:6px; font-weight:850; letter-spacing:.11em; }
+    .driver-list { display:grid; gap:10px; }
+    .driver-list div { display:grid; grid-template-columns:1fr 34px; align-items:center; gap:7px; }
+    .driver-list span { color:#abc2bf; font-size:9px; }.driver-list b { color:#f4d478; text-align:right; font-size:9px; }
+    .driver-meter { grid-column:1 / -1; height:4px; overflow:hidden; border-radius:8px; background:rgba(225,247,242,.1); }.driver-meter i { display:block; height:100%; border-radius:inherit; background:var(--yellow); }
+    .model-footer { padding:0 18px 14px; color:#76908c; font-size:8px; line-height:1.45; }
+    .roster { padding-bottom:7px; }
+    .table-wrap { overflow-x:auto; padding:10px 14px 0; }
+    table { width:100%; border-collapse:collapse; min-width:520px; }
+    th { padding:11px 7px; color:#73918d; border-bottom:1px solid var(--line); text-align:left; text-transform:uppercase; letter-spacing:.09em; font-size:8px; font-weight:820; }
+    td { padding:10px 7px; border-bottom:1px solid rgba(196,237,230,.075); color:#d2e9e4; font-size:10px; }
+    tr:last-child td { border-bottom:0; }
+    .name-cell { display:flex; align-items:center; gap:8px; }
+    .mini-avatar { display:grid; place-items:center; flex:none; width:27px; height:27px; border-radius:50%; color:#f2fffc; background:linear-gradient(135deg,#377c83,#5a507b); font-size:8px; font-weight:800; }
+    .mini-avatar.rose { background:linear-gradient(135deg,#a85971,#6e5388); }
+    .mini-avatar.gold { background:linear-gradient(135deg,#967542,#315b72); }
+    .mini-avatar.blue { background:linear-gradient(135deg,#396c9a,#58537e); }
+    .name-cell strong { display:block; color:#effaf7; font-size:10px; font-weight:690; }
+    .name-cell small { display:block; margin-top:2px; color:#7d9895; font-size:9px; }
+    .risk-cell { display:flex; align-items:center; gap:7px; }
+    .risk-bar { width:50px; height:5px; overflow:hidden; border-radius:99px; background:rgba(207,238,233,.1); }
+    .risk-bar i { display:block; height:100%; border-radius:inherit; background:var(--teal); }
+    .risk-bar.high i { background:var(--orange); }
+    .risk-bar.mid i { background:var(--yellow); }
+    .risk-num { font-weight:700; font-variant-numeric:tabular-nums; }
+    .status { display:inline-flex; align-items:center; gap:5px; padding:4px 6px; border-radius:6px; background:rgba(73,225,189,.09); color:#7af0d1; font-size:9px; font-weight:750; }
+    .status::before { content:""; width:5px; height:5px; border-radius:50%; background:currentColor; }
+    .status.watch { color:#ffd172; background:rgba(255,215,114,.09); }
+    .status.attention { color:#ffa473; background:rgba(255,157,101,.1); }
+    .wellbeing { padding-bottom:15px; }
+    .wellbeing-body { padding:15px 17px 0; }
+    .score-ring { display:grid; grid-template-columns:86px 1fr; align-items:center; gap:13px; padding:2px 0 14px; }
+    .ring { width:82px; height:82px; display:grid; place-items:center; position:relative; border-radius:50%; background:conic-gradient(var(--teal) 0deg 281deg,rgba(219,245,240,.1) 281deg); }
+    .ring::after { content:""; position:absolute; inset:7px; border-radius:50%; background:var(--surface); }
+    .ring strong { z-index:1; font-size:18px; letter-spacing:-.05em; }
+    .ring span { z-index:1; margin-left:2px; color:#7e9996; font-size:8px; }
+    .score-ring h3 { margin:0; font-size:12px; }
+    .score-ring p { margin:5px 0 0; color:#91aaa6; font-size:10px; line-height:1.45; }
+    .balance-row { margin-top:12px; }
+    .balance-meta { display:flex; justify-content:space-between; margin-bottom:5px; color:#a2bbb7; font-size:9px; }
+    .balance-track { height:5px; overflow:hidden; border-radius:9px; background:rgba(213,245,240,.1); }
+    .balance-fill { height:100%; border-radius:inherit; background:var(--teal); }
+    .balance-fill.sleep { background:var(--cyan); }
+    .balance-fill.load { background:var(--yellow); }
+    .recommend-strip { display:flex; gap:8px; margin-top:17px; }
+    .quick-card { flex:1; min-width:0; padding:9px; color:#d9f2ee; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.027); text-align:left; }
+    .quick-card:hover { border-color:rgba(73,225,189,.32); background:rgba(73,225,189,.07); }
+    .quick-card svg { width:15px; height:15px; color:var(--teal); }
+    .quick-card span { display:block; overflow:hidden; margin-top:7px; text-overflow:ellipsis; white-space:nowrap; font-size:9px; font-weight:700; }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:15px; margin-bottom:15px; }
+    .section-head h2 { margin:0; font-size:21px; letter-spacing:-.035em; }
+    .section-head p { margin:5px 0 0; color:#8ca6a2; font-size:11px; }
+    .filter-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .search { position:relative; flex:1; }
+    .search svg { position:absolute; left:12px; top:50%; width:16px; height:16px; color:#88a39f; transform:translateY(-50%); }
+    .search input,.select { width:100%; padding:10px 12px 10px 36px; color:#d8ece8; border:1px solid var(--line); border-radius:10px; outline:none; background:rgba(10,34,37,.75); font-size:11px; }
+    .search input::placeholder { color:#728d89; }
+    .select { width:auto; padding-left:12px; }
+    .personnel-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .person-card { padding:17px; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(145deg,rgba(15,43,47,.82),rgba(8,27,31,.85)); box-shadow:var(--shadow); }
+    .person-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .person-card .mini-avatar { width:38px; height:38px; font-size:10px; }
+    .role-tag { padding:4px 7px; border-radius:6px; color:#9fbbb6; background:rgba(255,255,255,.045); font-size:8px; font-weight:700; }
+    .person-card h3 { margin:12px 0 3px; font-size:13px; }
+    .person-card .unit { color:#809b97; font-size:10px; }
+    .card-score { display:flex; align-items:center; gap:10px; margin:16px 0 13px; padding:11px; border-radius:10px; background:rgba(2,13,15,.27); }
+    .score-num { color:var(--teal); font-size:24px; letter-spacing:-.06em; font-weight:760; }
+    .score-copy { color:#8ea8a5; font-size:9px; line-height:1.45; }
+    .score-copy strong { display:block; color:#d1e8e4; font-size:10px; }
+    .person-meta { display:flex; justify-content:space-between; color:#869f9c; border-top:1px solid var(--line); padding-top:12px; font-size:9px; }
+    .person-meta b { color:#c6ddd9; font-weight:650; }
+    .person-card .card-actions { display:flex; gap:8px; margin-top:14px; }
+    .btn { border:0; border-radius:9px; padding:9px 11px; color:#d8eeea; background:rgba(232,250,246,.09); font-size:10px; font-weight:760; transition:.16s ease; }
+    .btn:hover { transform:translateY(-1px); background:rgba(232,250,246,.16); }
+    .btn.primary { color:#05211e; background:var(--teal); }
+    .btn.primary:hover { background:#73edd0; }
+    .btn.small { padding:7px 9px; font-size:9px; }
+    .btn.full { width:100%; }
+    .alerts-stack { display:grid; gap:12px; }
+    .alert-card { display:grid; grid-template-columns:43px 1fr auto; align-items:start; gap:13px; padding:16px; border:1px solid var(--line); border-left:3px solid var(--orange); border-radius:14px; background:linear-gradient(135deg,rgba(76,45,35,.33),rgba(13,39,42,.8)); }
+    .alert-card.medium { border-left-color:var(--yellow); background:linear-gradient(135deg,rgba(70,59,35,.24),rgba(13,39,42,.8)); }
+    .alert-card.low { border-left-color:var(--teal); background:linear-gradient(135deg,rgba(23,74,66,.21),rgba(13,39,42,.8)); }
+    .alert-level { display:grid; place-items:center; width:42px; height:42px; color:var(--orange); border-radius:11px; background:rgba(255,157,101,.11); }
+    .alert-level svg { width:19px; height:19px; }
+    .alert-card.medium .alert-level { color:var(--yellow); background:rgba(255,215,114,.1); }
+    .alert-card.low .alert-level { color:var(--teal); background:rgba(73,225,189,.1); }
+    .alert-card h3 { margin:1px 0 5px; font-size:12px; }
+    .alert-card p { max-width:640px; margin:0; color:#94afaa; line-height:1.45; font-size:10px; }
+    .alert-card .alert-foot { display:flex; gap:12px; margin-top:10px; color:#849f9a; font-size:9px; }
+    .alert-card .alert-foot b { color:#d2e8e4; font-weight:700; }
+    .alert-actions { display:flex; gap:7px; }
+    .reco-layout { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+    .profile-hero { position:relative; min-height:260px; overflow:hidden; padding:23px; border:1px solid rgba(90,235,199,.25); border-radius:var(--radius); background:linear-gradient(135deg,#0d3f42 0%,#0b252a 60%,#102a2d 100%); box-shadow:var(--shadow); }
+    .profile-hero::before { content:""; position:absolute; width:300px; height:300px; right:-70px; top:-130px; border:1px solid rgba(135,255,222,.17); border-radius:50%; box-shadow:0 0 0 37px rgba(135,255,222,.035),0 0 0 74px rgba(135,255,222,.025); }
+    .profile-hero > * { position:relative; }
+    .profile-label { color:#78e8cc; text-transform:uppercase; letter-spacing:.13em; font-size:9px; font-weight:800; }
+    .profile-hero h2 { max-width:390px; margin:10px 0 8px; font-size:25px; line-height:1.08; letter-spacing:-.045em; }
+    .profile-hero p { max-width:470px; margin:0; color:#a6c5c0; line-height:1.5; font-size:11px; }
+    .profile-chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:20px; }
+    .chip { padding:5px 8px; border:1px solid rgba(185,245,232,.13); border-radius:20px; color:#b8d8d2; background:rgba(2,17,19,.21); font-size:9px; }
+    .profile-hero .btn { margin-top:21px; }
+    .plan-card { padding-bottom:16px; }
+    .plan-progress { padding:17px 18px 0; }
+    .plan-numbers { display:flex; align-items:end; justify-content:space-between; margin-bottom:8px; }
+    .plan-numbers strong { font-size:23px; letter-spacing:-.05em; }
+    .plan-numbers span { color:#859e9b; font-size:9px; }
+    .wide-track { height:7px; overflow:hidden; border-radius:20px; background:rgba(226,249,244,.11); }
+    .wide-track i { display:block; width:68%; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--teal),#91f4d8); }
+    .plan-list { display:grid; gap:9px; padding:15px 18px 0; }
+    .plan-task { display:flex; align-items:center; gap:9px; color:#aec6c2; font-size:10px; }
+    .task-check { display:grid; place-items:center; width:17px; height:17px; flex:none; border:1px solid #315b59; border-radius:50%; color:#06231f; background:var(--teal); }
+    .task-check svg { width:11px; height:11px; stroke-width:3; }
+    .task-check.pending { background:transparent; color:transparent; }
+    .recommendations { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:16px; } .jamendo-panel { margin-top:16px; padding:16px; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(145deg,rgba(16,49,53,.9),rgba(7,28,32,.94)); box-shadow:var(--shadow); }
+    .jamendo-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .jamendo-title { display:flex; align-items:center; gap:9px; font-weight:800; }
+    .jamendo-title-badge { width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:rgba(73,225,189,.13); color:var(--teal); font-weight:900; }
+    .jamendo-controls { display:flex; gap:7px; flex-wrap:wrap; }
+    .jamendo-chip { border:1px solid var(--line); background:rgba(255,255,255,.03); color:#cce4df; border-radius:999px; padding:7px 10px; cursor:pointer; font-size:10px; font-weight:700; }
+    .jamendo-chip.active { border-color:rgba(73,225,189,.55); background:rgba(73,225,189,.1); color:#e5fff8; }
+    .jamendo-results { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .jamendo-track { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.025); }
+    .jamendo-track strong { display:block; font-size:10px; color:#dff3ef; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .jamendo-track small { display:block; margin-top:3px; color:#78938e; font-size:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .jamendo-open { flex:0 0 auto; color:var(--teal); text-decoration:none; font-size:9px; font-weight:800; }
+    .jamendo-note { margin-top:9px; color:#78938e; font-size:9px; line-height:1.45; }
+    .jamendo-player { margin-top:14px; padding:12px; border:1px solid rgba(73,225,189,.18); border-radius:12px; background:rgba(0,0,0,.18); }
+    .jamendo-player-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:9px; }
+    .jamendo-player-title { font-size:11px; font-weight:800; color:#dff3ef; }
+    .jamendo-player audio { width:100%; display:block; margin-top:6px; border-radius:10px; } .jamendo-license { margin-top:7px; color:#78938e; font-size:8px; line-height:1.4; word-break:break-all; }
+    .music-hub { margin-top:16px; }
+    .music-hub-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .music-select { width:100%; margin-top:8px; padding:11px 12px; border-radius:10px; border:1px solid var(--line); background:#0a2529; color:#dff3ef; font:inherit; outline:none; }
+    .music-select:focus { border-color:rgba(73,225,189,.65); box-shadow:0 0 0 3px rgba(73,225,189,.08); }
+    .music-hub-card { padding:18px; }
+    .music-hub-card h3 { margin:0 0 6px; font-size:14px; }
+    .music-hub-card p { color:#78938e; font-size:10px; line-height:1.5; margin:0 0 12px; }
+    .jamendo-dropdown-wrap { margin-top:12px; }
+    .jamendo-dropdown-label { display:block; color:#8daaa5; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+    @media (max-width:900px) { .music-hub-grid { grid-template-columns:1fr; } }
+    .ai-robot { width:25px;height:25px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 25px; } .ai-robot svg{width:25px;height:25px;display:block;}
+    .ai-fab { position:fixed; right:22px; bottom:22px; z-index:75; border:1px solid rgba(73,225,189,.45); background:#0c3538; color:#e8fff9; border-radius:999px; padding:11px 15px; box-shadow:0 12px 35px rgba(0,0,0,.35); cursor:pointer; font-weight:800; font-size:11px; }
+    .ai-chat { width:min(420px,calc(100vw - 28px)); height:min(620px,calc(100vh - 110px)); position:fixed; right:22px; bottom:78px; z-index:76; display:none; flex-direction:column; overflow:hidden; border:1px solid rgba(133,246,213,.22); border-radius:18px; background:#092326; box-shadow:0 25px 70px rgba(0,0,0,.5); }
+    .ai-chat.open { display:flex; }
+    .ai-chat-head { padding:15px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
+    .ai-chat-head strong { font-size:13px; } .ai-chat-head small { display:block; color:#78938e; margin-top:3px; font-size:9px; }
+    .ai-chat-close { border:0; background:transparent; color:#a9c3be; font-size:20px; cursor:pointer; }
+    .ai-messages { flex:1; overflow:auto; padding:14px; display:grid; align-content:start; gap:9px; }
+    .ai-msg { max-width:86%; padding:10px 12px; border-radius:12px; font-size:10px; line-height:1.5; white-space:pre-wrap; }
+    .ai-msg.bot { background:rgba(255,255,255,.05); color:#cce2de; justify-self:start; }
+    .ai-msg.user { background:rgba(73,225,189,.13); color:#e6fff8; justify-self:end; }
+    .ai-quick { padding:8px 12px; display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid var(--line); }
+    .ai-quick button { border:1px solid var(--line); background:rgba(255,255,255,.03); color:#bcd5d0; border-radius:999px; padding:6px 9px; font-size:9px; cursor:pointer; }
+    .ai-input { display:flex; gap:7px; padding:10px 12px 12px; border-top:1px solid var(--line); }
+    .ai-input input { flex:1; min-width:0; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.04); color:#e8f8f5; padding:10px; outline:none; }
+    .ai-input button { border:0; border-radius:10px; padding:0 13px; background:var(--teal); color:#062528; font-weight:900; cursor:pointer; }
+
+
+    .reco-card { overflow:hidden; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(150deg,rgba(16,49,53,.88),rgba(7,28,32,.9)); box-shadow:var(--shadow); }
+    .reco-visual { position:relative; height:104px; overflow:hidden; }
+    .music-visual { background:linear-gradient(120deg,#112e42,#245e61 47%,#a16b61); }
+    .place-visual { background:linear-gradient(125deg,#4e6e61,#24464c 45%,#14333b); }
+    .yoga-visual { background:linear-gradient(125deg,#382c58,#6e597a 55%,#286570); }
+    .reco-visual::before,.reco-visual::after { content:""; position:absolute; border-radius:50%; }
+    .music-visual::before { width:143px; height:143px; right:-34px; top:-56px; border:24px solid rgba(255,220,154,.5); box-shadow:0 0 0 12px rgba(255,220,154,.12); }
+    .music-visual::after { width:48px; height:48px; left:28px; bottom:20px; border:11px solid rgba(202,246,240,.55); }
+    .place-visual::before { width:230px; height:70px; left:-15px; bottom:-31px; background:#173b3e; transform:rotate(-7deg); box-shadow:89px -18px 0 -4px #2b594e,175px 0 0 -4px #244b47; }
+    .place-visual::after { width:90px; height:90px; right:32px; top:-44px; background:rgba(255,230,146,.72); box-shadow:0 0 50px rgba(255,221,132,.25); }
+    .yoga-visual::before { width:150px; height:150px; right:23px; bottom:-96px; border:22px solid rgba(184,239,230,.36); }
+    .yoga-visual::after { width:8px; height:8px; left:36px; top:27px; background:#d9ffeb; box-shadow:20px 14px 0 #d9ffeb,48px -4px 0 #d9ffeb,85px 18px 0 #d9ffeb,117px -1px 0 #d9ffeb; }
+    .reco-icon { position:absolute; left:16px; bottom:14px; display:grid; place-items:center; width:32px; height:32px; color:#06221e; border-radius:9px; background:#d4ffef; z-index:1; }
+    .reco-icon svg { width:17px; height:17px; }
+    .reco-body { padding:15px; }
+    .reco-type { color:var(--teal); text-transform:uppercase; letter-spacing:.11em; font-size:8px; font-weight:820; }
+    .reco-body h3 { margin:7px 0 5px; font-size:13px; }
+    .reco-body p { min-height:29px; margin:0; color:#93aca8; line-height:1.4; font-size:9px; }
+    .reco-foot { display:flex; align-items:center; justify-content:space-between; margin-top:13px; color:#8fa7a3; font-size:9px; }
+    .vacation-list { list-style:none; margin:6px 0 0; padding:0; display:grid; gap:6px; }
+    .vacation-list li { font-size:9px; line-height:1.4; color:#c9e6e1; background:rgba(2,20,22,.35); border:1px solid var(--line); border-radius:8px; padding:7px 9px; }
+    .vacation-list li b { display:block; color:#e7f7f2; font-size:10px; margin-bottom:2px; }
+    .reco-foot button { padding:0; color:var(--teal); border:0; background:transparent; font-size:9px; font-weight:780; }
+    .checkin-layout { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr); gap:16px; }
+    .checkin-panel { padding:22px; }
+    .checkin-panel h2 { margin:0; font-size:20px; letter-spacing:-.035em; }
+    .checkin-panel > p { margin:7px 0 22px; color:#93aaa7; font-size:11px; line-height:1.5; }
+    .question { padding:15px 0; border-top:1px solid var(--line); }
+    .question:first-of-type { border-top:0; padding-top:0; }
+    .question-head { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:12px; }
+    .question label { color:#d1e8e4; font-size:12px; font-weight:650; }
+    .question-output { color:var(--teal); font-size:13px; font-weight:800; }
+    input[type=range] { width:100%; accent-color:var(--teal); }
+    .scale-labels { display:flex; justify-content:space-between; color:#738d89; font-size:8px; }
+    .choice-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
+    .choice { min-height:38px; padding:4px; border:1px solid var(--line); border-radius:8px; color:#9db5b1; background:rgba(255,255,255,.025); font-size:9px; }
+    .choice.selected { color:#05211d; border-color:var(--teal); background:var(--teal); font-weight:800; }
+    .checkin-panel textarea { width:100%; min-height:74px; resize:vertical; padding:10px; color:#d6ece7; border:1px solid var(--line); border-radius:10px; outline:none; background:rgba(2,14,16,.28); font-size:11px; }
+    .checkin-panel textarea::placeholder { color:#718c88; }
+    .checkin-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:15px; }
+    .checkin-aside { padding:20px; }
+    .checkin-aside h3 { margin:0; font-size:14px; }
+    .checkin-aside p { color:#92aba7; font-size:10px; line-height:1.5; }
+    .info-callout { display:flex; gap:10px; padding:12px; border:1px solid rgba(118,215,255,.18); border-radius:11px; background:rgba(118,215,255,.07); }
+    .info-callout svg { width:17px; height:17px; flex:none; color:var(--cyan); }
+    .info-callout p { margin:0; }
+    .support-list { display:grid; gap:1px; margin-top:17px; }
+    .support-link { display:flex; justify-content:space-between; align-items:center; padding:12px 2px; color:#c8e1dc; border-bottom:1px solid var(--line); background:transparent; text-align:left; font-size:10px; }
+    .support-link span { color:var(--teal); font-size:14px; }
+    .empty { display:none; padding:30px 10px; color:#8fa7a3; text-align:center; font-size:12px; }
+    .toast-region { position:fixed; right:20px; bottom:20px; display:grid; gap:9px; z-index:100; }
+    .toast { display:flex; align-items:center; gap:10px; min-width:260px; max-width:340px; padding:12px; color:#dcf9f3; border:1px solid rgba(73,225,189,.26); border-radius:12px; background:#103237; box-shadow:0 14px 35px rgba(0,0,0,.35); animation:toast-in .26s ease; font-size:10px; }
+    .toast svg { width:18px; height:18px; color:var(--teal); }
+    @keyframes toast-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    .modal-backdrop { display:none; align-items:center; justify-content:center; position:fixed; inset:0; padding:20px; background:rgba(1,11,12,.75); backdrop-filter:blur(5px); z-index:80; }
+    .modal-backdrop.open { display:flex; }
+    .modal { width:min(500px,100%); max-height:calc(100vh - 40px); overflow:auto; padding:22px; border:1px solid rgba(133,246,213,.24); border-radius:18px; background:#0d292d; box-shadow:0 30px 80px rgba(0,0,0,.45); animation:modal-in .24s ease; }
+    @keyframes modal-in { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:none} }
+    .modal-top { display:flex; justify-content:space-between; gap:15px; align-items:start; }
+    .modal h2 { margin:0; font-size:19px; letter-spacing:-.035em; }
+    .modal p { color:#94ada9; font-size:10px; line-height:1.5; }
+    .modal-close { padding:2px; color:#a7c1bc; border:0; background:transparent; font-size:21px; line-height:1; }
+    .modal-section { margin-top:18px; padding-top:16px; border-top:1px solid var(--line); }
+    .modal-section strong { font-size:11px; }
+    .modal-list { display:grid; gap:7px; margin-top:11px; }
+    .modal-item { display:flex; align-items:center; justify-content:space-between; padding:10px; border-radius:9px; background:rgba(255,255,255,.04); color:#bfd8d3; font-size:10px; }
+    .modal-item span { color:var(--teal); font-weight:800; }
+    .hidden { display:none!important; }
+    .site-intro { min-height:100vh; display:grid; place-items:center; position:relative; overflow:hidden; padding:28px; background:radial-gradient(circle at 12% 18%,rgba(44,125,111,.35),transparent 28rem),radial-gradient(circle at 88% 82%,rgba(211,167,74,.14),transparent 30rem),linear-gradient(135deg,#041113,#071d20 52%,#0b292c); }
+    .site-intro::before { content:""; position:absolute; width:620px; height:620px; right:-210px; top:-250px; border:1px solid rgba(242,214,126,.18); border-radius:50%; box-shadow:0 0 0 42px rgba(242,214,126,.035),0 0 0 88px rgba(242,214,126,.02); }
+    .intro-shell { width:min(1180px,100%); position:relative; z-index:1; }
+    .intro-top { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .intro-brand { display:flex; align-items:center; gap:13px; }
+    .intro-brand .brand-title { font-size:16px; }
+    .intro-logos { display:flex; align-items:center; gap:10px; }
+    .gov-badge,.cisf-badge { min-width:82px; height:58px; display:flex; align-items:center; justify-content:center; gap:7px; padding:7px 10px; border:1px solid rgba(236,246,239,.13); border-radius:12px; background:rgba(255,255,255,.035); color:#e9f3ed; }
+    .gov-badge .chakra { width:30px; height:30px; border:2px solid #e7e9e3; border-radius:50%; position:relative; }
+    .gov-badge .chakra::after { content:""; position:absolute; inset:5px; border:1px solid #e7e9e3; border-radius:50%; }
+    .gov-badge span,.cisf-badge span { font-size:8px; line-height:1.15; font-weight:800; letter-spacing:.06em; text-align:center; }
+    .cisf-mark { width:32px; height:38px; display:grid; place-items:center; border:2px solid #e9c965; border-radius:50% 50% 45% 45%; color:#f3d776; font-size:9px; font-weight:900; }
+    .intro-grid { display:grid; grid-template-columns:1.12fr .88fr; gap:42px; align-items:center; padding:74px 0 44px; }
+    .intro-copy .eyebrow { color:#f2d67e; }
+    .intro-copy h1 { max-width:760px; font-size:clamp(42px,6.5vw,76px); letter-spacing:-.065em; }
+    .intro-copy h1 em { color:#54e3c0; font-style:normal; }
+    .intro-copy p { max-width:660px; margin:20px 0 0; color:#a9c5c0; font-size:15px; line-height:1.7; }
+    .intro-actions { display:flex; flex-wrap:wrap; gap:11px; margin-top:28px; }
+    .intro-actions .btn { padding:13px 17px; font-size:11px; }
+    .intro-trust { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:34px; }
+    .intro-trust div { padding:13px; border:1px solid rgba(207,239,231,.1); border-radius:13px; background:rgba(255,255,255,.025); }
+    .intro-trust b { display:block; color:#e8f4ef; font-size:11px; }
+    .intro-trust span { display:block; margin-top:4px; color:#7f9c97; font-size:9px; line-height:1.45; }
+    .intro-card { position:relative; padding:25px; border:1px solid rgba(120,235,207,.2); border-radius:24px; background:linear-gradient(145deg,rgba(16,56,58,.86),rgba(7,28,32,.94)); box-shadow:0 30px 90px rgba(0,0,0,.35); }
+    .intro-card::before { content:""; position:absolute; width:170px; height:170px; right:-45px; top:-50px; border:18px solid rgba(242,214,126,.14); border-radius:50%; }
+    .intro-card h2 { margin:0; font-size:20px; }
+    .intro-card p { color:#92ada8; font-size:10px; line-height:1.55; }
+    .intro-flow { display:grid; gap:9px; margin-top:20px; }
+    .intro-step { display:grid; grid-template-columns:32px 1fr; gap:10px; align-items:center; padding:11px; border:1px solid rgba(200,239,231,.08); border-radius:11px; background:rgba(0,10,12,.22); }
+    .intro-step b { display:grid; place-items:center; width:28px; height:28px; border-radius:9px; color:#06221e; background:#49e1bd; font-size:10px; }
+    .intro-step strong { display:block; font-size:10px; }
+    .intro-step span { display:block; margin-top:3px; color:#78938f; font-size:8px; }
+    .intro-note { margin-top:18px!important; padding-top:14px; border-top:1px solid var(--line); font-size:9px!important; }
+    .google-btn { width:100%; display:flex; align-items:center; justify-content:center; gap:9px; margin-top:11px; padding:10px 12px; color:#e8f2ef; border:1px solid rgba(221,239,235,.16); border-radius:9px; background:#f7f9f8; color:#18312f; font-size:10px; font-weight:800; }
+    .google-btn:hover { filter:brightness(1.03); transform:translateY(-1px); }
+    .google-g { width:17px; height:17px; display:grid; place-items:center; border-radius:50%; color:#4285f4; background:#fff; font-weight:900; }
+    .google-note { margin:7px 0 0!important; color:#708b87!important; font-size:8px!important; }
+    .music-player { margin-top:16px; padding:15px; border:1px solid rgba(73,225,189,.16); border-radius:14px; background:linear-gradient(135deg,rgba(13,60,57,.55),rgba(7,28,32,.8)); }
+    .music-player-top { display:flex; align-items:center; gap:12px; }
+    .album-orb { width:45px; height:45px; flex:none; display:grid; place-items:center; border-radius:50%; background:conic-gradient(#49e1bd,#76d7ff,#ffd772,#49e1bd); box-shadow:0 0 0 7px rgba(73,225,189,.07); }
+    .album-orb::after { content:""; width:15px; height:15px; border-radius:50%; background:#092326; }
+    .music-copy { min-width:0; flex:1; }
+    .music-copy .reco-type { margin-bottom:4px; }
+    .music-copy h3 { margin:0; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .music-copy p { margin:4px 0 0; font-size:8px; }
+    .player-controls { display:flex; align-items:center; gap:9px; margin-top:12px; }
+    .player-controls button { width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; color:#dff4ef; background:rgba(255,255,255,.05); }
+    .player-controls button.primary-play { width:38px; height:38px; color:#05211e; background:var(--teal); border-color:transparent; }
+    .player-controls button svg { width:15px; height:15px; }
+    .player-progress { flex:1; height:5px; border-radius:10px; overflow:hidden; background:rgba(220,245,240,.1); }
+    .player-progress i { display:block; width:0%; height:100%; border-radius:inherit; background:var(--teal); transition:width .2s linear; }
+    .player-time { color:#7f9995; font-size:8px; min-width:58px; text-align:right; }
+    .auth-portal { display:none; position:fixed; inset:0; z-index:200; overflow:auto; padding:clamp(16px,4vw,44px); background:radial-gradient(circle at 12% 13%,#1f5b5b 0,transparent 26rem),radial-gradient(circle at 92% 90%,#4c4430 0,transparent 32rem),#061619; }
+    .auth-portal.open { display:grid; place-items:center; }
+    .auth-frame { width:min(1060px,100%); min-height:620px; display:grid; grid-template-columns:1.04fr .96fr; overflow:hidden; border:1px solid rgba(189,239,227,.16); border-radius:24px; background:#0c282c; box-shadow:0 32px 100px rgba(0,0,0,.5); }
+    .auth-story { position:relative; display:flex; flex-direction:column; padding:clamp(26px,4vw,48px); overflow:hidden; background:linear-gradient(145deg,rgba(13,70,70,.97),rgba(6,30,34,.97)); }
+    .auth-story::before { content:""; position:absolute; width:380px; height:380px; right:-112px; bottom:-154px; border:1px solid rgba(244,216,120,.23); border-radius:50%; box-shadow:0 0 0 32px rgba(244,216,120,.045),0 0 0 65px rgba(244,216,120,.03); }
+    .auth-story > * { position:relative; }
+    .auth-brand { display:flex; align-items:center; gap:13px; }.auth-brand .force-emblem{width:47px;height:52px}.auth-brand .force-emblem svg{width:47px;height:52px}.auth-brand .brand-title{font-size:15px}.auth-brand .brand-title small{font-size:8px;}
+    .auth-story h1 { max-width:430px; margin:66px 0 13px; font-size:clamp(31px,4vw,49px); line-height:1.02; letter-spacing:-.058em; }
+    .auth-story h1 em { color:#f3d776; font-style:normal; }
+    .auth-story > p { max-width:400px; margin:0; color:#b4cfca; line-height:1.6; font-size:13px; }
+    .auth-trust { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:auto; padding-top:45px; }.auth-trust div { padding:10px; border:1px solid rgba(206,246,237,.11); border-radius:11px; background:rgba(2,19,21,.18); }.auth-trust b { display:block; color:#f3d776; font-size:13px; }.auth-trust span { display:block; margin-top:3px; color:#a6c2bd; font-size:8px; line-height:1.35; }
+    .auth-panel { display:flex; flex-direction:column; padding:clamp(25px,4vw,47px); background:linear-gradient(145deg,#0c262a,#081d20); }.auth-panel-top { display:flex; justify-content:flex-end; color:#7f9995; font-size:9px; }.auth-panel-top i { width:6px; height:6px; margin:3px 5px 0 0; border-radius:50%; background:var(--teal); }
+    .auth-tabs { display:flex; gap:20px; margin-top:42px; border-bottom:1px solid var(--line); }.auth-tab { padding:0 0 10px; color:#8fa8a4; border:0; border-bottom:2px solid transparent; background:transparent; font-size:12px; font-weight:750; }.auth-tab.active { color:#e9f7f3; border-bottom-color:var(--teal); }
+    .auth-form { display:none; padding-top:25px; }.auth-form.active { display:block; animation:appear .23s ease; }.auth-form h2 { margin:0; font-size:24px; letter-spacing:-.045em; }.auth-form p { margin:7px 0 19px; color:#91aaa6; line-height:1.5; font-size:10px; }
+    .auth-fields { display:grid; gap:12px; }.auth-field label { display:block; margin-bottom:6px; color:#b7ceca; font-size:9px; font-weight:720; }.auth-field input { width:100%; padding:11px 12px; color:#e7f7f2; border:1px solid var(--line); border-radius:9px; outline:none; background:rgba(0,11,13,.28); font-size:11px; }.auth-field input:focus{border-color:rgba(73,225,189,.7)}.auth-field input::placeholder{color:#66807d}
+    .auth-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:13px 0 18px; }.auth-check { display:flex; align-items:center; gap:7px; color:#91aba7; font-size:9px; }.auth-check input{accent-color:var(--teal)}.auth-link { padding:0; color:var(--teal); border:0; background:none; font-size:9px; font-weight:700; }.auth-error { min-height:14px; margin:10px 0 -4px; color:#ff9d9d; font-size:9px; }.auth-demo { margin-top:20px; padding:10px; border:1px solid rgba(118,215,255,.15); border-radius:10px; color:#9bb9b5; background:rgba(118,215,255,.055); font-size:9px; line-height:1.5; }.auth-demo b { color:#d5eeea; }.auth-demo button { margin:7px 0 0; padding:0; color:var(--cyan); border:0; background:transparent; font-size:9px; font-weight:800; }
+    .question-grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
+    .question.compact { border-top:1px solid var(--line); }
+    .number-input { width:100%; padding:10px 11px; color:#d6ece7; border:1px solid var(--line); border-radius:9px; outline:none; background:rgba(2,14,16,.28); font-size:11px; }
+    .number-input:focus { border-color:rgba(73,225,189,.55); box-shadow:0 0 0 3px rgba(73,225,189,.07); }
+    .report-upload { padding:13px; border:1px dashed rgba(73,225,189,.3); border-radius:11px; background:rgba(73,225,189,.045); }
+    .report-upload label { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
+    .report-upload input { display:none; }
+    .report-file { margin-top:8px; color:#8fa7a3; font-size:9px; }
+    .recommend-targets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-top:14px; }
+    .target-card { padding:11px; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.025); }
+    .target-card span { display:block; color:#718c88; font-size:8px; text-transform:uppercase; letter-spacing:.08em; }
+    .target-card strong { display:block; margin-top:5px; color:#d6eee9; font-size:15px; }
+    .target-card small { color:#8da7a2; font-size:8px; }
+    .puzzle-wrap { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:16px; }
+    .puzzle-board { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; padding:16px; }
+    .puzzle-tile { aspect-ratio:1; border:1px solid rgba(73,225,189,.16); border-radius:12px; background:linear-gradient(145deg,#103a3d,#0a252a); color:transparent; font-size:23px; cursor:pointer; transition:transform .18s, border-color .18s, background .18s; }
+    .puzzle-tile:hover { transform:translateY(-2px); border-color:rgba(73,225,189,.45); }
+    .puzzle-tile.flipped,.puzzle-tile.matched { color:#d8fff1; background:linear-gradient(145deg,#15524e,#103c40); border-color:rgba(73,225,189,.55); }
+    .puzzle-side { padding:18px; }
+    .puzzle-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0; }
+    .puzzle-stat { padding:11px; border-radius:10px; background:rgba(255,255,255,.035); }
+    .puzzle-stat span { display:block; color:#718c88; font-size:8px; }
+    .puzzle-stat strong { display:block; margin-top:4px; font-size:18px; }
+    .calm-note { padding:11px; border-radius:10px; color:#9bb6b1; background:rgba(73,225,189,.06); font-size:9px; line-height:1.5; }
+    .music-player audio { width:100%; height:34px; margin-top:10px; opacity:.86; }
+    @media (max-width:1080px) { .metrics{grid-template-columns:repeat(2,1fr)} .personnel-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .recommendations{grid-template-columns:1fr} .reco-card{display:grid;grid-template-columns:155px 1fr}.reco-visual{height:auto;min-height:134px} }
+    @media (max-width:820px) { .app-shell{display:block}.sidebar{position:fixed; left:0; top:0; width:244px; transform:translateX(-104%); transition:transform .25s ease; box-shadow:18px 0 35px rgba(0,0,0,.3)} .sidebar.open{transform:none}.menu-button{display:grid}.topbar{margin-bottom:22px}.dashboard-grid,.rows-grid,.analytic-row,.reco-layout,.checkin-layout{grid-template-columns:1fr}.brief-panel{min-height:auto}.date-block{display:none} }
+    @media (max-width:560px) { main{padding:18px 14px 28px}.metrics{grid-template-columns:1fr 1fr;gap:9px}.metric{min-height:102px;padding:13px}.metric-value{font-size:25px}.header-intro{display:block}.heading-sub{font-size:12px}.top-actions .icon-button:nth-child(2){display:none}.personnel-grid{grid-template-columns:1fr}.filter-bar{align-items:stretch;flex-direction:column}.select{width:100%}.alert-card{grid-template-columns:36px 1fr}.alert-actions{grid-column:2}.alert-level{width:34px;height:34px}.alert-card p{font-size:9px}.reco-card{display:block}.reco-visual{height:104px}.choice-grid{grid-template-columns:repeat(3,1fr)}.checkin-actions{flex-wrap:wrap}.checkin-actions .btn{flex:1}.trend-panel{min-height:285px}.chart-wrap{height:155px}.live-state{display:none} }
+    @media (max-width:760px) { .auth-portal{padding:0}.auth-frame{min-height:100vh;border:0;border-radius:0;grid-template-columns:1fr}.auth-story{min-height:286px;padding:25px}.auth-story h1{margin:34px 0 9px;font-size:32px}.auth-story>p{font-size:11px}.auth-trust{padding-top:25px}.auth-panel{padding:26px 24px 34px}.auth-tabs{margin-top:22px} }
+  
+    .welfare-mode .personal-nav-label,.welfare-mode .personal-nav-item{display:none!important}
+    .welfare-mode .brand-title small{color:#F2D67E}
+    .portal-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:#9bc7bd;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-left:8px}
+    .welfare-mode .header-intro h1:after{content:'Welfare Officer Workspace';display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#F2D67E;margin-top:8px}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script><script>fetch("/api/config").then(r=>r.json()).then(c=>window.GOOGLE_CLIENT_ID=c.googleClientId||"").catch(()=>{});</script>
+</head>
+<body>
+  <section class="site-intro" id="siteIntro" aria-label="StressMitra website overview">
+    <div class="intro-shell">
+      <div class="intro-top">
+        <div class="intro-brand"><div class="force-emblem"><svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 2 43 9v14c0 13-7.8 23.3-19 28C12.8 46.3 5 36 5 23V9l19-7Z" fill="#174D4B" stroke="#F2D67E" stroke-width="1.5"/><path d="m24 14 2.4 6.1 6.6.4-5.1 4.2 1.7 6.4-5.6-3.5-5.6 3.5 1.7-6.4-5.1-4.2 6.6-.4L24 14Z" fill="#F2D67E"/></svg></div><div class="brand-title">STRESS<em>MITRA</em><small>PERSONNEL WELFARE INTELLIGENCE</small></div></div>
+        <div class="intro-logos"><div class="cisf-badge"><div class="cisf-mark">CISF</div><span>CENTRAL<br/>INDUSTRIAL<br/>SECURITY FORCE</span></div><div class="gov-badge"><div class="chakra"></div><span>GOVERNMENT<br/>OF INDIA</span></div></div>
+      </div>
+      <div class="intro-grid">
+        <div class="intro-copy">
+          <p class="eyebrow">AI-powered welfare & recovery platform</p>
+          <h1>See the signal.<br/><em>Support the person.</em></h1>
+          <p>StressMitra helps authorised welfare teams understand changing wellbeing patterns and gives personnel private, practical recovery guidance. It is designed for support—not diagnosis, punishment, or automated command decisions.</p>
+          <div class="intro-actions"><button class="btn primary" id="introSignIn">Personnel portal</button><button class="btn" id="introWelfare">Welfare officer portal</button><button class="btn" id="introRegister">Create personnel account</button></div>
+          <div class="intro-trust"><div><b>Predictive</b><span>Trend-based risk signals and explainable contributors.</span></div><div><b>Privacy-first</b><span>Role-based access, minimisation and human review.</span></div><div><b>Recovery-led</b><span>Personal recommendations for rest, workload and wellbeing.</span></div></div>
+        </div>
+        <div class="intro-card"><p class="eyebrow">How StressMitra works</p><h2>One secure flow from signal to support</h2><p>Use the overview first, then enter the protected workspace only when you are ready.</p><div class="intro-flow"><div class="intro-step"><b>01</b><div><strong>Check wellbeing signals</strong><span>Voluntary check-ins + authorised HR/duty trends</span></div></div><div class="intro-step"><b>02</b><div><strong>Predict and explain</strong><span>Risk trend, confidence and key contributors</span></div></div><div class="intro-step"><b>03</b><div><strong>Recommend recovery</strong><span>Music, movement and workload/recovery guidance</span></div></div><div class="intro-step"><b>04</b><div><strong>Human-led support</strong><span>Welfare action stays with an authorised human</span></div></div></div><p class="intro-note">Prototype note: demo data is synthetic. CISF / Government of India marks are shown for prototype visual context and do not imply official endorsement.</p></div>
+      </div>
+    </div>
+  </section>
+  <div class="app-shell" id="appShell" style="display:none">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="brand"><div class="force-emblem" aria-label="StressMitra force-inspired emblem"><svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 2 43 9v14c0 13-7.8 23.3-19 28C12.8 46.3 5 36 5 23V9l19-7Z" fill="#174D4B" stroke="#F2D67E" stroke-width="1.5"/><path d="M24 7 38 12v11c0 10-5.4 18-14 22-8.6-4-14-12-14-22V12L24 7Z" stroke="#7EE7CC" stroke-width="1"/><path d="m24 14 2.4 6.1 6.6.4-5.1 4.2 1.7 6.4-5.6-3.5-5.6 3.5 1.7-6.4-5.1-4.2 6.6-.4L24 14Z" fill="#F2D67E"/><path d="M14 36c3.2 2.9 6.4 4.7 10 6.1 3.6-1.4 6.8-3.2 10-6.1" stroke="#7EE7CC" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="brand-title">STRESS<em>MITRA</em><small>FORCES WELFARE SYSTEM</small></div></div>
+      <nav class="nav">
+        <p class="nav-label">Command view</p>
+        <button class="nav-item active" data-view="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Overview</button>
+        <button class="nav-item" data-view="personnel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Personnel <span class="nav-badge" id="personnelBadge">1</span></button>
+        <button class="nav-item" data-view="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Welfare alerts <span class="nav-badge">4</span></button>
+        <p class="nav-label personal-nav-label" style="margin-top:20px">Personal space</p>
+        <button class="nav-item personal-nav-item" data-view="recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 0 0-4 12.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26A7 7 0 0 0 12 2Z"/><path d="M9 22h6M8 12h8"/></svg>Recommendations</button>
+        <button class="nav-item personal-nav-item" data-view="music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music</button>
+        <button class="nav-item personal-nav-item" data-view="checkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 12 2 2 4-4"/><path d="M20 7v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 4Z"/><path d="M14 3v5h6"/></svg>Daily check-in</button>
+        <button class="nav-item personal-nav-item" data-view="puzzle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3h3a2 2 0 1 1 4 0h3a2 2 0 0 1 2 2v3a2 2 0 1 1 0 4v3a2 2 0 0 1-2 2h-3a2 2 0 1 1-4 0H8a2 2 0 0 1-2-2v-3a2 2 0 1 1 0-4V5a2 2 0 0 1 2-2Z"/></svg>Calm puzzle</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4M12 15v2"/></svg><strong>Privacy by design</strong><p>Consent-led insights. Supervisors see trends and support needs—not private journal entries.</p></div>
+        <div class="operator"><div class="avatar" id="operatorInitials">AG</div><div><span id="operatorName">Capt. A. Gupta</span><small id="operatorRole">Welfare officer · On duty</small></div></div>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div class="topbar-left"><button class="icon-button menu-button" id="menuToggle" aria-label="Open navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div><div class="crumb"><strong id="crumbTitle">Command centre</strong> <span id="crumbUnit"> / —</span></div></div><div class="live-state"><i class="pulse"></i>secure sync active</div></div>
+        <div class="top-actions"><button class="icon-button" id="privacyButton" aria-label="Privacy information"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></button><button class="icon-button" id="notificationButton" aria-label="Notifications"><span class="tiny-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><div class="avatar">AG</div></div>
+      </header>
+
+      <section class="tab-view active" id="overview">
+        <div class="header-intro"><div><p class="eyebrow">StressMitra · operational wellbeing, made actionable</p><h1>Support the force before pressure becomes a crisis.</h1><p class="heading-sub">StressMitra uses voluntary check-ins, duty patterns and protected wellness signals to surface timely, human-led support.</p></div><div class="date-block"><strong>Friday, 11 September</strong>Shift 02 · 08:00–16:00 IST</div></div>
+        <div class="metrics">
+          <article class="metric"><div class="metric-label">Force wellbeing index</div><div class="metric-value"><span id="forceIndex">78</span><small>/100</small></div><div class="metric-note"><strong>+4.2%</strong> from last week</div></article>
+          <article class="metric"><div class="metric-label">Active welfare signals</div><div class="metric-value"><span id="activeSignals">4</span><small> people</small></div><div class="metric-note warn"><strong id="followupCount">2</strong> need a follow-up today</div></article>
+          <article class="metric"><div class="metric-label">Check-in completion</div><div class="metric-value"><span id="completionPct">86</span><small>%</small></div><div class="metric-note"><strong>127</strong> of 148 submitted</div></article>
+          <article class="metric"><div class="metric-label">Recovery readiness</div><div class="metric-value"><span id="readinessPct">71</span><small>%</small></div><div class="metric-note"><strong>+6 pts</strong> since Monday</div></article>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel trend-panel"><div class="panel-head"><div><p class="panel-kicker">Predicted stress load</p><h2 class="panel-title">Seven-day readiness trend</h2></div><button class="panel-action" data-view-jump="personnel">View personnel</button></div><div class="trend-summary"><div><div class="trend-main"><span id="trendMainValue">0</span><span> / 100</span></div><div class="trend-caption" id="trendCaption">No screening submitted yet</div></div><div class="legend"><span><i></i>Stress load</span><span><i class="b"></i>Review level</span></div></div><div class="chart-wrap"><svg id="stressChart" viewBox="0 0 640 180" role="img" aria-label="Seven day stress trend. Current value is 31, below the review level of 55."><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#49e1bd" stop-opacity=".4"/><stop offset="1" stop-color="#49e1bd" stop-opacity="0"/></linearGradient></defs><line class="chart-grid" x1="45" x2="620" y1="25" y2="25"/><line class="chart-grid" x1="45" x2="620" y1="73" y2="73"/><line class="chart-grid" x1="45" x2="620" y1="121" y2="121"/><line class="chart-grid" x1="45" x2="620" y1="151" y2="151"/><text class="chart-label" x="8" y="28">80</text><text class="chart-label" x="8" y="76">55</text><text class="chart-label" x="8" y="124">30</text><path class="threshold" d="M45 73H620"/><path class="area" d="M45 115 C76 105,103 93,136 99 S197 107,230 82 S288 51,320 72 S380 111,412 108 S470 85,502 96 S559 118,620 104 L620 151 L45 151 Z"/><path class="chart-line" d="M45 115 C76 105,103 93,136 99 S197 107,230 82 S288 51,320 72 S380 111,412 108 S470 85,502 96 S559 118,620 104"/><circle class="point" cx="620" cy="104" r="5"/><rect class="chart-tag" x="591" y="76" width="32" height="18" rx="5"/><text class="chart-tag-text" x="599" y="89">31</text><text class="chart-label" x="42" y="171">Fri</text><text class="chart-label" x="132" y="171">Sat</text><text class="chart-label" x="222" y="171">Sun</text><text class="chart-label" x="310" y="171">Mon</text><text class="chart-label" x="400" y="171">Tue</text><text class="chart-label" x="490" y="171">Wed</text><text class="chart-label" x="592" y="171">Today</text></svg></div></section>
+          <section class="panel brief-panel"><div class="panel-head"><div><p class="panel-kicker">Today’s brief</p><h2 class="panel-title">What needs your attention</h2></div><button class="panel-action" data-view-jump="alerts">All alerts</button></div><div class="brief-items"><div class="brief-item"><div class="brief-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a7 7 0 0 0-4 12.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26A7 7 0 0 0 12 2Z"/><path d="M9 22h6"/></svg></div><div><strong>Recovery window opens</strong><p>Recommend a 15 min unwind for Bravo team after field drill.</p></div><time>09:30</time></div><div class="brief-item"><div class="brief-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg></div><div><strong>Shift pattern watch</strong><p>Two members have logged 3 consecutive late rotations.</p></div><time>11:00</time></div><div class="brief-item"><div class="brief-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 7h-5V2M4 17h5v5"/><path d="M19 2a9 9 0 0 0-15 7M5 22a9 9 0 0 0 15-7"/></svg></div><div><strong>Check-in reminder</strong><p>21 members have not completed their daily wellbeing check.</p></div><time>12:15</time></div></div></section>
+        </div>
+        <div class="analytic-row">
+          <section class="panel analytic-panel"><div class="panel-head"><div><p class="panel-kicker">Force risk map</p><h2 class="panel-title">Support signal distribution</h2></div><button class="panel-action" data-view-jump="alerts">Review</button></div><div class="risk-donut-wrap"><div class="risk-donut" id="riskDonut"><strong id="riskTotal">148</strong><span>members</span></div><div class="dist-legend"><div><span><i></i>Stable</span><b id="riskStable">112</b></div><div><span><i class="watch"></i>Watch</span><b id="riskWatch">28</b></div><div><span><i class="follow"></i>Follow-up</span><b id="riskFollow">8</b></div></div></div></section>
+          <section class="panel analytic-panel"><div class="panel-head"><div><p class="panel-kicker">Unit readiness</p><h2 class="panel-title">Recovery capacity by unit</h2></div><span class="status">Live</span></div><div class="unit-bars" id="unitBars"><div class="unit-row"><span>Alpha</span><div class="unit-track"><i style="width:82%"></i></div><b>82%</b></div><div class="unit-row"><span>Bravo</span><div class="unit-track"><i style="width:68%"></i></div><b>68%</b></div><div class="unit-row"><span>Charlie</span><div class="unit-track"><i style="width:85%"></i></div><b>85%</b></div></div></section>
+          <section class="panel analytic-panel"><div class="panel-head"><div><p class="panel-kicker">Explainable AI</p><h2 class="panel-title">Early-risk driver board</h2></div><button class="panel-action" id="openModelCard">Model card</button></div><div class="driver-layout"><div class="driver-shield" aria-label="Advisory model, human review required"></div><div class="driver-list" id="driverList"><div><span>Short rest</span><b>+31</b><div class="driver-meter"><i style="width:78%"></i></div></div><div><span>Rising stress trend</span><b>+24</b><div class="driver-meter"><i style="width:61%"></i></div></div><div><span>Night rotations</span><b>+17</b><div class="driver-meter"><i style="width:44%"></i></div></div></div></div><p class="model-footer" id="modelFooter">Signals rank support needs. They never diagnose, rank worth, or trigger discipline.</p></section>
+        </div>
+        <div class="rows-grid"><section class="panel roster"><div class="panel-head"><div><p class="panel-kicker">Unit pulse</p><h2 class="panel-title">Priority support queue</h2></div><button class="panel-action" data-view-jump="personnel">View full roster</button></div><div class="table-wrap"><table><thead><tr><th>Personnel</th><th>Stress signal</th><th>Last check-in</th><th>Status</th></tr></thead><tbody id="priorityTable"><tr><td><div class="name-cell"><div class="mini-avatar">AG</div><div><strong>A. Gupta</strong><small>Northern sector · Personnel</small></div></div></td><td><div class="risk-cell"><span class="risk-bar"><i style="width:4%"></i></span><span class="risk-num">4</span></div></td><td>Today · 09:05</td><td><span class="status">Stable</span></td></tr></tbody></table></div></section><section class="panel wellbeing"><div class="panel-head"><div><p class="panel-kicker">Current wellbeing</p><h2 class="panel-title" id="wellbeingName">Your profile</h2></div><button class="panel-action" data-view-jump="checkin">Check in</button></div><div class="wellbeing-body"><div class="score-ring"><div class="ring"><strong id="myScore">0</strong><span>/100</span></div><div><h3>Awaiting a current screening</h3><p>Submit a check-in to update this live recovery view.</p></div></div><div class="balance-row"><div class="balance-meta"><span>Sleep consistency</span><b>82%</b></div><div class="balance-track"><div class="balance-fill sleep" style="width:82%"></div></div></div><div class="balance-row"><div class="balance-meta"><span>Workload balance</span><b>68%</b></div><div class="balance-track"><div class="balance-fill load" style="width:68%"></div></div></div><div class="recommend-strip"><button class="quick-card" id="overviewJamendo" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Jamendo music</span></button><button class="quick-card" data-view-jump="recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6.5 12 3l9 3.5v11L12 21l-9-3.5v-11Z"/><path d="m3 6.5 9 3.5 9-3.5M12 10v11"/></svg><span>Nearby reset</span></button><button class="quick-card" data-view-jump="recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="5" r="2"/><path d="m12 7 3 5 5 2M9 21l3-9 3 9M9 12l-4 3"/></svg><span>6-min yoga</span></button></div></div></section></div>
+      </section>
+
+      <section class="tab-view" id="personnel">
+        <div class="section-head"><div><p class="eyebrow">Protected roster insight</p><h2>Personnel welfare overview</h2><p>Review aggregated signals with context; start a conversation, not an automated judgment.</p></div><button class="btn primary" id="exportRoster">Export support brief</button></div>
+        <div class="filter-bar"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="personSearch" type="search" placeholder="Search name, unit or role" aria-label="Search personnel" /></div><select id="riskFilter" class="select" aria-label="Filter by support signal"><option value="all">All support signals</option><option value="attention">Needs follow-up</option><option value="watch">Watch list</option><option value="stable">Stable</option></select></div>
+        <div class="personnel-grid" id="personnelGrid"></div><div class="empty" id="emptyRoster">No personnel match those filters.</div>
+      </section>
+
+      <section class="tab-view" id="alerts">
+        <div class="section-head"><div><p class="eyebrow">Human-led intervention</p><h2>Welfare alerts</h2><p>Signals ask for supportive follow-up. They are never disciplinary flags or a diagnosis.</p></div><button class="btn" id="alertSettings">Alert preferences</button></div>
+        <div class="alerts-stack" id="alertsStack"></div><div class="empty" id="emptyAlerts">No active welfare alerts. New alerts will appear after a reviewed check-in.All current alerts have been reviewed. Great work keeping the support loop human.</div>
+      </section>
+
+      <section class="tab-view" id="recommendations">
+        <div class="section-head"><div><p class="eyebrow">Personal recovery companion</p><h2>Recommendations for your next reset</h2><p>Based on your chosen preferences and current self-reported load. You stay in control of what is shared.</p></div><button class="btn" id="refreshReco">Refresh suggestions</button></div><section class="panel maps-panel" id="nearbyMapPanel">
+          <div class="panel-head"><div><p class="panel-kicker">Nearby recovery places</p><h2 class="panel-title">Find a nearby place & get a walking route</h2></div><span class="status">Google Maps</span></div>
+          <p class="map-note">Use your browser location to find nearby parks, libraries, cafes and other low-effort places. StressMitra does not store your exact location.</p>
+          <div class="map-controls"><button class="btn primary" id="findNearbyPlaces">Use my location</button><select id="nearbyType" class="select"><option value="park">Parks</option><option value="library">Libraries</option><option value="cafe">Cafes</option><option value="tourist_attraction">Places to visit</option></select><span id="mapStatus" class="map-status">Google Maps API key required for live nearby search.</span></div>
+          <div class="map-grid"><div id="nearbyMap" class="nearby-map"></div><div id="nearbyPlaces" class="nearby-places"><div class="empty-state">Choose “Use my location” to find nearby places.</div></div></div>
+          <div class="map-note">Routes use Google Maps Platform. Enable Maps JavaScript API, Places API (New) and Routes API for your Google Maps key.</div>
+        </section>
+
+        <div class="reco-layout"><section class="profile-hero"><div class="profile-label">Your recovery profile</div><h2>Steady focus, with room to breathe.</h2><p>Your last check-in suggests you’ll benefit most from a quiet, low-effort reset that moves your body and gives attention a softer landing.</p><div class="profile-chips"><span class="chip">Focus: steady</span><span class="chip">Energy: moderate</span><span class="chip">Time: 15–30 min</span><span class="chip">Preference: outdoors</span></div><button class="btn primary" id="tuneProfile">Tune my preferences</button></section><section class="panel plan-card"><div class="panel-head"><div><p class="panel-kicker">Today’s gentle plan</p><h2 class="panel-title">2 of 3 moments complete</h2></div><span class="status">On track</span></div><div class="plan-progress"><div class="plan-numbers"><strong>68%</strong><span>Next reset · 18:30</span></div><div class="wide-track"><i></i></div></div><div class="plan-list"><div class="plan-task"><span class="task-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 12 4 4L19 6"/></svg></span>90-second breathing pause</div><div class="plan-task"><span class="task-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 12 4 4L19 6"/></svg></span>Hydration before briefing</div><div class="plan-task"><span class="task-check pending"></span>15-minute decompression walk</div></div></section></div>
+        <div class="panel" style="padding:18px;margin-top:16px"><div class="panel-head"><div><p class="panel-kicker">Personal recovery plan</p><h2 class="panel-title">Suggested operating targets</h2></div><span class="status">Advisory · review with welfare staff</span></div><p style="color:#93aaa8;font-size:10px;line-height:1.5;margin:8px 0 0">These are non-clinical recovery targets calculated from the voluntary check-in. They are guidance, not orders or medical instructions.</p><div class="recommend-targets"><div class="target-card"><span>Suggested duty</span><strong id="targetDuty">8 h</strong><small>consider a shorter load when signals rise</small></div><div class="target-card"><span>Suggested sleep</span><strong id="targetSleep">7.5 h</strong><small>protect a consistent recovery window</small></div><div class="target-card"><span>Suggested workload</span><strong id="targetWorkload">Moderate</strong><small>reduce non-essential load if needed</small></div></div></div><div class="recommendations">
+          <article class="reco-card"><div class="reco-visual music-visual"><div class="reco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div></div><div class="reco-body"><div class="reco-type">Audio reset · 18 min</div><h3 id="musicTitle">Low-tempo focus flow</h3><p id="musicDesc">Instrumental textures designed for a calm transition after a high-focus shift.</p><div class="reco-foot"><span>Adaptive audio · original tracks</span><button class="reco-action" data-type="music">Open player</button></div><div class="music-player" id="musicPlayer"><div class="music-player-top"><div class="album-orb"></div><div class="music-copy"><div class="reco-type">Health-matched recovery audio</div><h3 id="playerTitle">Clear-head instrumental</h3><p id="playerReason">Selected from your current wellbeing state.</p></div></div><div class="player-controls"><button id="playerPrev" type="button" aria-label="Previous track">‹</button><button id="playerPlay" class="primary-play" type="button" aria-label="Play or pause"><svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><button id="playerNext" type="button" aria-label="Next track">›</button><div class="player-progress"><i id="playerProgress"></i></div><span class="player-time" id="playerTime">0:00 / 0:20</span></div><audio id="healthAudio" preload="metadata"></audio></div></div></article>
+          <article class="reco-card"><div class="reco-visual place-visual"><div class="reco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></div></div><div class="reco-body"><div class="reco-type">Nearby reset · 22 min</div><h3 id="placeTitle">Lakeside perimeter walk</h3><p id="placeDesc">A shaded, low-noise route suited to a gentle decompress with no planning overhead.</p><div class="reco-foot"><span>1.4 km · quiet route</span><button class="reco-action" data-type="place">View route</button></div></div></article>
+          <article class="reco-card"><div class="reco-visual yoga-visual"><div class="reco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="5" r="2"/><path d="m12 7 3 5 5 2M9 21l3-9 3 9M9 12l-4 3"/></svg></div></div><div class="reco-body"><div class="reco-type">Movement · 6 min</div><h3 id="yogaTitle">Shoulder & spine reset</h3><p id="yogaDesc">Three accessible, uniform-friendly poses to release desk and equipment tension.</p><div class="reco-foot"><span>Standing · beginner</span><button class="reco-action" data-type="yoga">Begin session</button></div></div></article>
+          <article class="reco-card"><div class="reco-visual place-visual"><div class="reco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 22h20M6 22V11l6-6 6 6v11M9 22v-6h6v6"/></svg></div></div><div class="reco-body"><div class="reco-type">Family vacation ideas</div><h3 id="vacationTitle">Add your duty location for tailored ideas</h3><p id="vacationDesc">Suggested family getaways will appear here based on where you're posted and where you last went.</p><ul id="vacationList" class="vacation-list"></ul><div class="reco-foot"><span id="vacationNote">Fill in the check-in fields above to see suggestions</span></div></div></article>
+          <article class="reco-card"><div class="reco-visual yoga-visual"><div class="reco-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C9 6 9 9 12 12c3-3 3-6 0-10Z"/><path d="M12 12v10M6 22c0-4 2.5-6 6-6s6 2 6 6"/></svg></div></div><div class="reco-body"><div class="reco-type">Breathing exercise</div><h3 id="breathingTitle">Box breathing (4-4-4-4)</h3><p id="breathingDesc">Inhale for 4 seconds, hold for 4, exhale for 4, hold for 4. Repeat for 2–3 minutes.</p><div class="reco-foot"><span id="breathingAlt">More options appear after your next check-in</span></div></div></article>
+        </div>
+      </section>
+
+      <section class="tab-view" id="music">
+        <div class="section-head"><div><p class="eyebrow">Music & recovery</p><h2>Your dedicated music space</h2><p>Choose a recommendation mood, then select a song. Jamendo playback stays separate from your recovery recommendations.</p></div></div>
+        <div class="music-hub-grid music-hub">
+          <section class="panel music-hub-card">
+            <div class="panel-head"><div><p class="panel-kicker">StressMitra audio</p><h2 class="panel-title">Health-matched recovery audio</h2></div><span class="status">Original</span></div>
+            <p id="musicHubReason">Selected from your current wellbeing signal.</p>
+            <div class="music-player" id="musicPlayerHub"><div class="music-player-top"><div class="album-orb"></div><div class="music-copy"><div class="reco-type">Recommended for your current state</div><h3 id="playerTitleHub">Clear-head instrumental</h3><p id="playerReasonHub">A quiet original track for a steady reset.</p></div></div><div class="player-controls"><button id="playerPrevHub" type="button">‹</button><button id="playerPlayHub" class="primary-play" type="button"><svg id="playIconHub" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><button id="playerNextHub" type="button">›</button><div class="player-progress"><i id="playerProgressHub"></i></div><span class="player-time" id="playerTimeHub">0:00 / 0:20</span></div><audio id="healthAudioHub" preload="metadata"></audio></div>
+          </section>
+          <section class="panel music-hub-card">
+            <div class="panel-head"><div><p class="panel-kicker">Jamendo player</p><h2 class="panel-title">Choose a Jamendo song</h2></div><span class="status">Jamendo</span></div>
+            <p>Start with a recommendation category, then choose an individual song from the dropdown below.</p>
+            <label class="jamendo-dropdown-label" for="jamendoMoodSelect">Recommendation</label>
+            <select class="music-select" id="jamendoMoodSelect">
+              <option value="recommended">Recommended for me</option>
+              <option value="Calm">Calm / unwind</option>
+              <option value="Focus">Focus / steady work</option>
+              <option value="Energetic">Energetic / refresh</option>
+            </select>
+            <div class="jamendo-dropdown-wrap"><label class="jamendo-dropdown-label" for="jamendoTrackSelect">Song</label><select class="music-select" id="jamendoTrackSelect"><option value="">Loading recommended songs…</option></select></div>
+            <div class="jamendo-player" id="jamendoPlayerHub" style="display:none"><div class="jamendo-player-head"><div><div class="reco-type">Now playing</div><div class="jamendo-player-title" id="jamendoNowPlayingHub">Select a track</div></div><a id="jamendoOpenCurrentHub" class="jamendo-open" href="#" target="_blank" rel="noopener noreferrer">Open on Jamendo ↗</a></div><audio id="jamendoAudioHub" controls preload="metadata"></audio><div class="jamendo-license" id="jamendoLicenseHub">Jamendo catalog track</div></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-view" id="checkin"><div class="section-head"><div><p class="eyebrow">Private daily check-in</p><h2>How are you arriving today?</h2><p>Your detailed response stays private. Add approximate duty, sleep, workload and wellbeing inputs if useful.</p></div><span class="status">Encrypted</span></div><div class="checkin-layout"><form class="panel checkin-panel" id="checkinForm"><h2>Wellbeing & duty questions</h2><p>Use approximate values if you prefer. These answers are advisory inputs, not a diagnosis.</p><div class="question-grid-2"><div class="question compact"><div class="question-head"><label for="dutyHours">Duty hours today</label><output class="question-output" id="dutyHoursValue">8 h</output></div><input type="range" min="0" max="16" value="8" step="0.5" id="dutyHours"><div class="scale-labels"><span>0 h</span><span>16 h</span></div></div><div class="question compact"><div class="question-head"><label for="sleepHours">Sleep in last 24 h</label><output class="question-output" id="sleepHoursValue">6.5 h</output></div><input type="range" min="0" max="12" value="6.5" step="0.5" id="sleepHours"><div class="scale-labels"><span>0 h</span><span>12 h</span></div></div><div class="question compact"><div class="question-head"><label for="energy">Energy right now</label><output class="question-output" id="energyValue">6 / 10</output></div><input type="range" min="1" max="10" value="6" id="energy"><div class="scale-labels"><span>Running low</span><span>Fully charged</span></div></div><div class="question compact"><div class="question-head"><label for="load">Workload pressure</label><output class="question-output" id="loadValue">5 / 10</output></div><input type="range" min="1" max="10" value="5" id="load"><div class="scale-labels"><span>Too much</span><span>Very manageable</span></div></div><div class="question compact"><div class="question-head"><label for="stressLevel">Current stress</label><output class="question-output" id="stressLevelValue">4 / 10</output></div><input type="range" min="1" max="10" value="4" id="stressLevel"><div class="scale-labels"><span>Low</span><span>High</span></div></div><div class="question compact"><div class="question-head"><label for="moodLevel">Mood</label><output class="question-output" id="moodLevelValue">7 / 10</output></div><input type="range" min="1" max="10" value="7" id="moodLevel"><div class="scale-labels"><span>Low</span><span>Positive</span></div></div><div class="question compact"><div class="question-head"><label for="focusLevel">Focus</label><output class="question-output" id="focusLevelValue">7 / 10</output></div><input type="range" min="1" max="10" value="7" id="focusLevel"><div class="scale-labels"><span>Difficult</span><span>Clear</span></div></div><div class="question compact"><div class="question-head"><label for="nightShifts">Night shifts in last 7 days</label><output class="question-output" id="nightShiftsValue">1</output></div><input type="range" min="0" max="7" value="1" id="nightShifts"><div class="scale-labels"><span>0</span><span>7</span></div></div><div class="question compact"><div class="question-head"><label for="recoveryDays">Recovery days in last 7 days</label><output class="question-output" id="recoveryDaysValue">1</output></div><input type="range" min="0" max="7" value="1" id="recoveryDays"><div class="scale-labels"><span>0</span><span>7</span></div></div><div class="question compact"><div class="question-head"><label for="socialSupport">Support connection</label><output class="question-output" id="socialSupportValue">7 / 10</output></div><input type="range" min="1" max="10" value="7" id="socialSupport"><div class="scale-labels"><span>Limited</span><span>Strong</span></div></div></div><div class="question-grid-2"><div class="question compact"><div class="question-head"><label for="dutyLocation">Where is your duty currently scheduled?</label></div><input type="text" id="dutyLocation" placeholder="e.g. Jammu, Leh, Chennai" maxlength="200"></div><div class="question compact"><div class="question-head"><label for="lastTrip">Last trip / vacation you visited</label></div><input type="text" id="lastTrip" placeholder="e.g. Goa, or leave blank" maxlength="200"></div></div><div class="question"><div class="question-head"><label>What would help most today?</label></div><div class="choice-grid" id="supportChoices"><button type="button" class="choice selected" data-choice="A quiet pause">A quiet pause</button><button type="button" class="choice" data-choice="Movement">Movement</button><button type="button" class="choice" data-choice="Talk to someone">Talk to someone</button><button type="button" class="choice" data-choice="Task support">Task support</button><button type="button" class="choice" data-choice="Nothing right now">Nothing right now</button></div></div><div class="question"><div class="question-head"><label for="note">Optional private note</label></div><textarea id="note" placeholder="Anything you want to note for yourself. This is not used as a model feature."></textarea></div><div class="question"><div class="question-head"><label>Health / wellness report <span style="color:var(--muted);font-weight:400">Optional PDF</span></label></div><div class="report-upload"><label for="healthReport"><span><strong>Select a PDF report</strong><br><small style="color:#8fa7a3">For authorised welfare review; maximum 8 MB.</small></span><span class="btn" style="padding:8px 11px">Choose PDF</span></label><input type="file" id="healthReport" accept="application/pdf,.pdf"><div class="report-file" id="reportFile">No report selected.</div></div></div><div class="checkin-actions"><button type="button" class="btn" id="skipCheckin">Save privately</button><button type="submit" class="btn primary">Submit check-in</button></div></form><aside class="panel checkin-aside"><h3>Support is always available</h3><p>This prototype is a support tool, not a diagnosis or emergency-care service.</p><div class="info-callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><p><strong style="color:#d5ebeb">Privacy note</strong><br/>Structured answers drive the demonstration prediction. Uploaded PDFs are stored separately for authorised human review and are not automatically interpreted as a diagnosis.</p></div><div class="support-list"><button type="button" class="support-link" data-support="Peer support"><span>Peer support</span><span>→</span></button><button type="button" class="support-link" data-support="Wellness counsellor"><span>Wellness counsellor</span><span>→</span></button><button type="button" class="support-link" data-support="Immediate assistance"><span>Immediate assistance</span><span>→</span></button></div></aside></div></section>
+
+<section class="tab-view" id="puzzle"><div class="section-head"><div><p class="eyebrow">Calm focus · 3–5 minutes</p><h2>Reset your attention with a gentle puzzle.</h2><p>A simple memory-match game for a short mental reset. Activity is local to this browser and is not included in the welfare prediction.</p></div><button class="btn" id="newPuzzle" type="button">New puzzle</button></div><div class="puzzle-wrap"><section class="panel"><div class="puzzle-board" id="puzzleBoard"></div></section><aside class="panel puzzle-side"><h3 style="margin:0">Memory match</h3><p style="color:#92aba7;font-size:10px;line-height:1.5">Find all eight pairs at an easy pace. The goal is a short attention break, not competition.</p><div class="puzzle-stats"><div class="puzzle-stat"><span>Moves</span><strong id="puzzleMoves">0</strong></div><div class="puzzle-stat"><span>Pairs</span><strong id="puzzlePairs">0/8</strong></div></div><div class="calm-note">Tip: take one slow breath before each turn and focus only on the two tiles you are comparing.</div></aside></div></section>
+</main>
+  </div>
+  <section class="auth-portal" id="authPortal" aria-label="StressMitra secure access portal">
+    <div class="auth-frame">
+      <div class="auth-story">
+        <div class="auth-brand"><div class="force-emblem" aria-hidden="true"><svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 2 43 9v14c0 13-7.8 23.3-19 28C12.8 46.3 5 36 5 23V9l19-7Z" fill="#174D4B" stroke="#F2D67E" stroke-width="1.5"/><path d="M24 7 38 12v11c0 10-5.4 18-14 22-8.6-4-14-12-14-22V12L24 7Z" stroke="#7EE7CC" stroke-width="1"/><path d="m24 14 2.4 6.1 6.6.4-5.1 4.2 1.7 6.4-5.6-3.5-5.6 3.5 1.7-6.4-5.1-4.2 6.6-.4L24 14Z" fill="#F2D67E"/></svg></div><div class="brand-title">STRESS<em>MITRA</em><small>FORCES WELFARE SYSTEM</small></div></div>
+        <h1>Care for the force.<br/><em>Start with one secure step.</em></h1>
+        <p>A private, consent-led wellbeing companion for uniformed forces. Get personal recovery guidance or safely coordinate welfare support with your authorised unit.</p>
+        <div class="auth-trust"><div><b>Private</b><span>Your notes are never shown in command view.</span></div><div><b>Human-led</b><span>Every welfare signal requires context and care.</span></div><div><b>Secure</b><span>Local account access with protected sessions.</span></div></div>
+      </div>
+      <div class="auth-panel">
+        <div class="auth-panel-top"><i></i><span id="authPortalLabel">Personnel portal · secure local access</span></div>
+        <div class="auth-tabs" role="tablist" aria-label="Account access"><button class="auth-tab active" type="button" data-auth-tab="signin" role="tab" aria-selected="true">Sign in</button><button class="auth-tab" type="button" data-auth-tab="create" role="tab" aria-selected="false">Create account</button></div>
+        <form class="auth-form active" id="signInForm" data-auth-form="signin"><h2 id="signInTitle">Welcome back</h2><p id="signInIntro">Sign in to continue to your protected StressMitra workspace.</p><div class="auth-fields"><div class="auth-field"><label for="signInEmail">Service email or username</label><input id="signInEmail" type="text" autocomplete="username" placeholder="name@unit.gov or username" required /></div><div class="auth-field"><label for="signInPassword">Password</label><input id="signInPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div></div><div class="auth-row"><label class="auth-check"><input type="checkbox" checked /> Keep this device signed in</label><button class="auth-link" type="button" id="forgotPassword">Need help?</button></div><button class="btn primary full" type="submit">Sign in securely</button><div id="googleSignIn" class="google-btn-wrap"></div><p class="google-note">Google access requires a configured OAuth client ID in this prototype.</p><p class="auth-error" id="signInError" role="alert"></p><div class="auth-demo"><b>Prototype access</b><br/>Personnel demo: <code>personnel01 / demo123</code><br/>Welfare demo: <code>welfare01 / demo123</code><br/><button type="button" id="useDemo">Use demo credentials</button></div></form>
+        <form class="auth-form" id="createAccountForm" data-auth-form="create"><h2>Create your account</h2><p>Set up your personal StressMitra access in less than a minute.</p><div class="auth-fields"><div class="auth-field"><label for="createName">Full name</label><input id="createName" type="text" autocomplete="name" placeholder="Rank and full name" required /></div><div class="auth-field"><label for="createEmail">Service email or username</label><input id="createEmail" type="text" autocomplete="username" placeholder="name@unit.gov or username" required /></div><div class="auth-field"><label for="createUnit">Unit / organisation</label><input id="createUnit" type="text" placeholder="e.g. Northern sector" required /></div><div class="auth-field"><label for="createPassword">Create password</label><input id="createPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></div></div><div class="auth-row"><label class="auth-check"><input id="termsAgree" type="checkbox" required /> I understand this is a prototype</label></div><button class="btn primary full" type="submit">Create secure account</button><p class="auth-error" id="createError" role="alert"></p></form>
+      </div>
+    </div>
+  </section>
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  <button class="ai-fab" id="aiFab" type="button"><span class="ai-robot" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 3v4" stroke="#F2D67E" stroke-width="2" stroke-linecap="round"/><path d="M13.5 3h5" stroke="#F2D67E" stroke-width="2" stroke-linecap="round"/><rect x="5" y="8" width="22" height="18" rx="5" fill="#173F40" stroke="#7EE7CC" stroke-width="1.5"/><path d="M8 8.5V6.8a2.8 2.8 0 0 1 2.8-2.8h10.4A2.8 2.8 0 0 1 24 6.8v1.7" stroke="#D8EAE5" stroke-width="1.2"/><circle cx="12" cy="16" r="2" fill="#7EE7CC"/><circle cx="20" cy="16" r="2" fill="#7EE7CC"/><path d="M11 21c2.8 1.7 7.2 1.7 10 0" stroke="#F2D67E" stroke-width="1.6" stroke-linecap="round"/><path d="M2.8 13h2M27.2 13h2M9 26v3M23 26v3" stroke="#D8EAE5" stroke-width="1.5" stroke-linecap="round"/></svg></span><span>AI Assistant</span></button>
+  <section class="ai-chat" id="aiChat" aria-label="StressMitra AI Assistant">
+    <div class="ai-chat-head"><div style="display:flex;align-items:center;gap:10px"><span class="ai-robot" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 3v4" stroke="#F2D67E" stroke-width="2" stroke-linecap="round"/><path d="M13.5 3h5" stroke="#F2D67E" stroke-width="2" stroke-linecap="round"/><rect x="5" y="8" width="22" height="18" rx="5" fill="#173F40" stroke="#7EE7CC" stroke-width="1.5"/><path d="M8 8.5V6.8a2.8 2.8 0 0 1 2.8-2.8h10.4A2.8 2.8 0 0 1 24 6.8v1.7" stroke="#D8EAE5" stroke-width="1.2"/><circle cx="12" cy="16" r="2" fill="#7EE7CC"/><circle cx="20" cy="16" r="2" fill="#7EE7CC"/><path d="M11 21c2.8 1.7 7.2 1.7 10 0" stroke="#F2D67E" stroke-width="1.6" stroke-linecap="round"/><path d="M2.8 13h2M27.2 13h2M9 26v3M23 26v3" stroke="#D8EAE5" stroke-width="1.5" stroke-linecap="round"/></svg></span><div><strong>StressMitra AI Assistant</strong><small>Army-style support bot · personalized after sign-in</small></div></div><button class="ai-chat-close" id="aiChatClose" type="button" aria-label="Close">×</button></div>
+    <div class="ai-messages" id="aiMessages"><div class="ai-msg bot">Hi! I can help with your latest wellbeing signal, recovery ideas, nearby reset places, Jamendo music, alerts, or support options.</div></div>
+    <div class="ai-quick"><button type="button" data-ai-q="How is my latest risk?">Latest risk</button><button type="button" data-ai-q="How can I recover better?">Recovery</button><button type="button" data-ai-q="Find a nearby place">Nearby place</button><button type="button" data-ai-q="Suggest calm music">Music</button></div>
+    <form class="ai-input" id="aiForm"><input id="aiInput" autocomplete="off" placeholder="Ask StressMitra…"><button type="submit">Send</button></form>
+  </section>
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-top"><div><h2 id="modalTitle">Support context</h2><p id="modalIntro">A private, respectful support view.</p></div><button class="modal-close" id="modalClose" aria-label="Close dialog">×</button></div><div id="modalContent"></div></div></div>
+  <script>
+    const $ = (selector, root=document) => root.querySelector(selector);
+    const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
+    const icons = {
+      check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 12 4 4L19 6"/></svg>',
+      heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.9-8.6a5.5 5.5 0 0 0-.1-7.8Z"/></svg>',
+      shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>'
+    };
+    const state = { portal:'personnel', choice:'A quiet pause', music:false, currentView:'overview', model:null, session:localStorage.getItem('stressmitra_session')||null, account:null, musicIndex:0, musicTracks:[{name:'Calm stress-relief ringtone',file:'/music/calm-stress-relief.wav',reason:'Gentle chimes and slow tones for a short reset'},{name:'Clear-head instrumental',file:'/music/clear-head.wav',reason:'Lower-load state · calm focus'},{name:'Evening recovery',file:'/music/evening-recovery.wav',reason:'Recovery window · softer transition'},{name:'Low-tempo focus flow',file:'/music/low-tempo.wav',reason:'Higher-load state · gentle downshift'}] };
+
+    async function api(path, options={}) {
+      const authHeaders = state.session ? {'Authorization':`Bearer ${state.session}`} : {};
+      const baseHeaders = {'Content-Type':'application/json', ...authHeaders, ...(options.headers||{})};
+      // Don't force JSON content type for file uploads.
+      if (options.body instanceof ArrayBuffer || options.body instanceof Blob || options.body instanceof FormData) delete baseHeaders['Content-Type'];
+      let response;
+      try { response = await fetch(path, { headers:baseHeaders, ...options }); }
+      catch { throw new Error('Local server unavailable. Start StressMitra and open http://127.0.0.1:8000 — do not open index.html directly.'); }
+      if (!response.ok) { const problem=await response.json().catch(()=>({})); throw new Error(problem.detail || problem.error || `Request failed (${response.status})`); }
+      return response.json();
+    }
+    function setText(id,value){ const el=$('#'+id); if(el) el.textContent=value; }
+    function updateAnalytics(data) {
+      // Adapt the Python/SQLite dashboard into the visual language of this interface.
+      const people = data.personnel || [];
+      const probs = people.map(p => Number(p.risk_probability || 0));
+      const avgRisk = probs.length ? probs.reduce((a,b)=>a+b,0)/probs.length : 0;
+      const wellbeing = Math.max(0, Math.round((1-avgRisk)*100));
+      const rd = data.risk_distribution || {};
+      setText('forceIndex', wellbeing);
+      setText('activeSignals', data.open_alerts ?? 0);
+      setText('followupCount', data.interventions_open ?? 0);
+      setText('completionPct', people.length ? Math.round((data.checkins_count||0)/Math.max(1,people.length)*100) : 0);
+      setText('readinessPct', wellbeing);
+      const total=(rd.Low||0)+(rd.Medium||0)+(rd.High||0);
+      setText('riskTotal',total); setText('riskStable',rd.Low||0); setText('riskWatch',rd.Medium||0); setText('riskFollow',rd.High||0);
+      if(total){
+        const a=(rd.Low||0)/total*360,b=((rd.Low||0)+(rd.Medium||0))/total*360;
+        $('#riskDonut').style.background=`conic-gradient(var(--teal) 0deg ${a}deg,var(--yellow) ${a}deg ${b}deg,var(--orange) ${b}deg 360deg)`;
+      }
+      const units={};
+      people.forEach(p=>{const u=p.unit||'Unassigned'; (units[u] ||= []).push(Number(p.risk_probability||0));});
+      $('#unitBars').innerHTML=Object.entries(units).map(([unit,vals])=>{const v=Math.max(0,Math.round((1-vals.reduce((a,b)=>a+b,0)/vals.length)*100));return `<div class="unit-row"><span>${unit}</span><div class="unit-track"><i style="width:${v}%"></i></div><b>${v}%</b></div>`;}).join('') || '<div class="empty-state">No screening data yet.</div>';
+      setMusicForWellbeing(wellbeing);
+      return wellbeing;
+    }
+    function escHtml(value){ return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fmtDate(value){
+      if(!value) return 'No check-in yet';
+      const d=new Date(value); if(Number.isNaN(d.getTime())) return String(value).slice(0,16).replace('T',' · ');
+      return d.toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    }
+    function riskLabel(prob){ const p=Number(prob||0)*100; return p>=67?'High':p>=34?'Medium':'Low'; }
+    function renderOverviewTrend(trend){
+      const svg=$('#stressChart'); if(!svg) return;
+      const values=(Array.isArray(trend)?trend:[]).slice(-7).map(x=>Number(x.value)||0);
+      if(!values.length){ svg.innerHTML='<text x="320" y="92" text-anchor="middle" class="chart-label">No screening data yet</text>'; return; }
+      const W=640,H=180,L=45,R=20,T=25,B=29,min=0,max=Math.max(100,...values,55);
+      const x=i=>values.length===1?(W+L-R)/2:L+i*(W-L-R)/(values.length-1);
+      const y=v=>H-B-(v/max)*(H-T-B);
+      const pts=values.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+      const area=`M ${x(0)} ${y(values[0])} ${values.slice(1).map((v,i)=>`L ${x(i+1)} ${y(v)}`).join(' ')} L ${x(values.length-1)} ${H-B} L ${x(0)} ${H-B} Z`;
+      const dots=values.map((v,i)=>`<circle class="point" cx="${x(i)}" cy="${y(v)}" r="4"><title>${v.toFixed(1)}% risk</title></circle>`).join('');
+      const labels=values.map((_,i)=>{const idx=i; return `<text class="chart-label" x="${x(idx)}" y="171" text-anchor="middle">${escHtml((trend[trend.length-values.length+i]?.label||'').slice(5,10))}</text>`;}).join('');
+      svg.innerHTML=`<line class="chart-grid" x1="45" x2="620" y1="25" y2="25"/><line class="chart-grid" x1="45" x2="620" y1="73" y2="73"/><line class="chart-grid" x1="45" x2="620" y1="121" y2="121"/><line class="chart-grid" x1="45" x2="620" y1="151" y2="151"/><text class="chart-label" x="8" y="28">100</text><text class="chart-label" x="8" y="76">67</text><text class="chart-label" x="8" y="124">34</text><text class="chart-label" x="8" y="154">0</text><path class="area" d="${area}"/><polyline class="chart-line" points="${pts}" fill="none"/><path class="threshold" d="M45 ${y(67)}H620"/>${dots}${labels}`;
+      const latest=values[values.length-1];
+      const tagX=Math.min(590,Math.max(50,x(values.length-1)-15));
+      svg.insertAdjacentHTML('beforeend',`<rect class="chart-tag" x="${tagX}" y="${Math.max(30,y(latest)-28)}" width="38" height="18" rx="5"/><text class="chart-tag-text" x="${tagX+8}" y="${Math.max(43,y(latest)-15)}">${Math.round(latest)}</text>`);
+    }
+    function renderAlerts(alerts){
+      const stack=$('#alertsStack'), empty=$('#emptyAlerts');
+      if(!stack||!empty) return;
+      const open=(Array.isArray(alerts)?alerts:[]).filter(a=>!Number(a.acknowledged));
+      stack.innerHTML=open.length?open.map(a=>{
+        const level=String(a.level||'Medium').toLowerCase();
+        const icon=level==='high'?'!':level==='medium'?'•':'✓';
+        const name=a.full_name||'Personnel';
+        return `<article class="alert-card ${escHtml(level)}" data-alert="${Number(a.id)}">
+          <div class="alert-level"><strong style="font-size:18px">${icon}</strong></div>
+          <div><h3>${escHtml(level.charAt(0).toUpperCase()+level.slice(1))} welfare signal · ${escHtml(name)}</h3>
+          <p>${escHtml(a.message)}</p><div class="alert-foot"><span>Created <b>${escHtml(fmtDate(a.created_at))}</b></span><span>Human review required</span></div></div>
+          <div class="alert-actions"><button class="btn small alert-open" data-person="${escHtml(name)}">View context</button><button class="btn small alert-resolve" data-alert="${Number(a.id)}">Acknowledge</button></div>
+        </article>`;
+      }).join(''):'';
+      empty.style.display=open.length?'none':'block';
+      const badges=$$('.nav-badge'); if(badges[1]) badges[1].textContent=String(open.length);
+      $$('.alert-open',stack).forEach(btn=>btn.addEventListener('click',()=>showPerson(btn.dataset.person)));
+      $$('.alert-resolve',stack).forEach(btn=>btn.addEventListener('click',async()=>{
+        const card=btn.closest('.alert-card'); const id=card?.dataset.alert;
+        try{ await api(`/api/alerts/${id}/ack`,{method:'POST'}); card.remove(); renderAlerts((Array.isArray(alerts)?alerts:[]).map(a=>String(a.id)===String(id)?{...a,acknowledged:1}:a)); toast('Alert acknowledged. The support action remains human-led.','heart'); }
+        catch(err){ toast(err.message||'Could not acknowledge the alert.'); }
+      }));
+    }
+    function updateOverview(data){
+      const people=Array.isArray(data.personnel)?data.personnel:[];
+      const history=Array.isArray(data.history)?data.history:[];
+      const displayPeople=people.length?people:(data.latest?[{...data.latest,full_name:data.user?.full_name,unit:data.user?.unit,id:data.user?.id,last_checkin:data.latest.created_at}]:[]);
+      const latestPeople=displayPeople.filter(p=>p.risk_probability!==null && p.risk_probability!==undefined);
+      const avg=latestPeople.length?latestPeople.reduce((s,p)=>s+Number(p.risk_probability||0),0)/latestPeople.length:0;
+      const wellbeing=Math.round((1-avg)*100);
+      const screened = data.screened_personnel_count ?? latestPeople.length;
+      const totalPeople=data.personnel_count ?? displayPeople.length;
+      const completion=totalPeople?Math.round(screened/totalPeople*100):0;
+      setText('forceIndex', wellbeing); setText('readinessPct',wellbeing);
+      setText('activeSignals',data.open_alerts||0); setText('followupCount',data.open_alerts||0);
+      setText('completionPct',Math.min(100,completion));
+      const rd=data.risk_distribution||{}; const total=(rd.Low||0)+(rd.Medium||0)+(rd.High||0);
+      setText('riskTotal',total); setText('riskStable',rd.Low||0); setText('riskWatch',rd.Medium||0); setText('riskFollow',rd.High||0);
+      if(total){ const a=(rd.Low||0)/total*360,b=((rd.Low||0)+(rd.Medium||0))/total*360; $('#riskDonut').style.background=`conic-gradient(var(--teal) 0deg ${a}deg,var(--yellow) ${a}deg ${b}deg,var(--orange) ${b}deg 360deg)`; }
+      else $('#riskDonut').style.background='conic-gradient(rgba(219,245,240,.1) 0deg 360deg)';
+      const trend=(Array.isArray(data.risk_trend)&&data.risk_trend.length)?data.risk_trend:history.map(r=>({label:String(r.created_at||'').slice(0,10),value:Math.round(Number(r.risk_probability||0)*1000)/10})); renderOverviewTrend(trend);
+      const latest=displayPeople.slice().sort((a,b)=>String(a.last_checkin||a.created_at||'').localeCompare(String(b.last_checkin||b.created_at||''))).find(p=>p.risk_probability!=null) || displayPeople[0];
+      const currentProb=latest?Number(latest.risk_probability||0):0;
+      const currentPct=Math.round(currentProb*100);
+      const trendMain=$('.trend-main'); if(trendMain) trendMain.innerHTML=`${currentPct}<span> / 100</span>`;
+      const trendCaption=$('.trend-caption'); if(trendCaption) trendCaption.textContent=latest?`Current ${riskLabel(currentProb).toLowerCase()} risk band · ${fmtDate(latest.last_checkin)}`:'No screening submitted yet';
+      const alerts=Array.isArray(data.alerts)?data.alerts:[];
+      renderAlerts(alerts);
+      const brief=document.querySelector('.brief-items');
+      if(brief){
+        const items=alerts.slice(0,3).map(a=>({title:`${a.level} welfare signal`,desc:a.message,time:fmtDate(a.created_at)}));
+        if(!items.length){ const missing=Math.max(0,totalPeople-screened); items.push({title:'Monitoring status',desc:screened?`${screened} of ${totalPeople} personnel have a current screening.`:'No screening records are available yet.',time:'Live'}); if(missing>0) items.push({title:'Check-in coverage',desc:`${missing} personnel have no current screening record.`,time:'Live'}); }
+        brief.innerHTML=items.map(x=>`<div class="brief-item"><div class="brief-icon">${icons.heart}</div><div><strong>${escHtml(x.title)}</strong><p>${escHtml(x.desc)}</p></div><time>${escHtml(x.time)}</time></div>`).join('');
+      }
+      const priority=document.getElementById('priorityTable');
+      if(priority){
+        const ranked=displayPeople.slice().sort((a,b)=>Number(b.risk_probability||0)-Number(a.risk_probability||0)).slice(0,6);
+        priority.innerHTML=ranked.length?ranked.map(p=>{const pct=Math.round(Number(p.risk_probability||0)*100), level=riskLabel(p.risk_probability); const initials=(p.full_name||'P').split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(); return `<tr><td><div class="name-cell"><div class="mini-avatar">${escHtml(initials)}</div><div><strong>${escHtml(p.full_name||'Personnel')}</strong><small>${escHtml(p.unit||'Unit')} · Personnel</small></div></div></td><td><div class="risk-cell"><span class="risk-bar"><i style="width:${pct}%"></i></span><span class="risk-num">${pct}</span></div></td><td>${escHtml(fmtDate(p.last_checkin))}</td><td><span class="status ${level==='High'?'attention':level==='Medium'?'watch':''}">${level}</span></td></tr>`}).join(''):`<tr><td colspan="4"><div class="empty-state">No screening data yet.</div></td></tr>`;
+      }
+      const mine = data.user?.role==='personnel' ? (data.latest || latest) : latest;
+      const score=document.getElementById('myScore'); if(score) score.textContent=mine?Math.max(0,100-Math.round(Number(mine.risk_probability||0)*100)):0;
+      const wellbeingTitle=document.querySelector('.wellbeing .score-ring h3'); const wellbeingDesc=document.querySelector('.wellbeing .score-ring p');
+      if(wellbeingTitle) wellbeingTitle.textContent=mine?`${riskLabel(mine.risk_probability)} risk · recovery ${Math.max(0,100-Math.round(Number(mine.risk_probability||0)*100))}/100`:'No check-in yet';
+      if(wellbeingDesc) wellbeingDesc.textContent=mine?`Last check-in: ${fmtDate(mine.last_checkin||mine.created_at)}. Use the next check-in to update your support plan.`:'Submit a check-in to generate your personal recovery view.';
+      const balanceRows=document.querySelectorAll('.wellbeing .balance-row');
+      if(balanceRows.length && mine){ const sleep=Number(mine.sleep_hours||0); const load=Number(mine.workload||0); const sleepPct=Math.max(0,Math.min(100,Math.round(sleep/8*100))); const loadPct=Math.max(0,Math.min(100,Math.round((10-load)/9*100))); balanceRows[0].querySelector('b').textContent=`${sleepPct}%`; balanceRows[0].querySelector('.balance-fill').style.width=`${sleepPct}%`; balanceRows[1].querySelector('b').textContent=`${loadPct}%`; balanceRows[1].querySelector('.balance-fill').style.width=`${loadPct}%`; }
+      const drivers=document.getElementById('driverList');
+      if(drivers){
+        let factors=[]; displayPeople.forEach(p=>{ if(p.factors_json){try{factors=factors.concat(JSON.parse(p.factors_json)||[])}catch{}} });
+        if(data.latest?.factors_json){try{factors=JSON.parse(data.latest.factors_json)||factors}catch{}}
+        const grouped={}; factors.forEach(f=>{const k=f.label||f.feature||'Signal'; grouped[k]=(grouped[k]||0)+1}); const entries=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,4);
+        drivers.innerHTML=entries.length?entries.map(([label,count])=>{const pct=Math.min(100,Math.round(count/Math.max(1,factors.length)*100));return `<div><span>${escHtml(label)}</span><b>${count}</b><div class="driver-meter"><i style="width:${pct}%"></i></div></div>`}).join(''):`<div class="empty-state">No elevated factors in current screening data.</div>`;
+      }
+      const dateBlock=document.querySelector('.date-block'); if(dateBlock) dateBlock.innerHTML=`<strong>${new Date().toLocaleDateString([], {weekday:'long',day:'2-digit',month:'long'})}</strong>Live screening data · ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+      const crumbUnit=document.getElementById('crumbUnit'); if(crumbUnit) crumbUnit.textContent=` / ${data.user?.unit||'Current unit'}`;
+      const wbName=document.getElementById('wellbeingName'); if(wbName) wbName.textContent=data.user?.full_name || latest?.full_name || 'Current profile';
+      const trendMainValue=document.getElementById('trendMainValue'); if(trendMainValue) trendMainValue.textContent=currentPct;
+    }
+    let mapsReady=false, nearbyMap=null, nearbyOrigin=null, nearbyMarkers=[];
+    async function loadGoogleMaps(){
+      if(mapsReady && window.google?.maps) return true;
+      try{
+        const cfg=await fetch('/api/config',{cache:'no-store'}).then(r=>r.json());
+        const key=cfg.googleMapsApiKey||'';
+        if(!key){ $('#mapStatus').textContent='Add your Google Maps API key to config/google-maps-api-key.txt.'; return false; }
+        await new Promise((resolve,reject)=>{ const existing=document.querySelector('script[data-stressmitra-maps]'); if(existing){ if(window.google?.maps) return resolve(); existing.addEventListener('load',resolve,{once:true}); existing.addEventListener('error',reject,{once:true}); return; } const sc=document.createElement('script'); sc.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`; sc.async=true; sc.defer=true; sc.dataset.stressmitraMaps='1'; sc.onload=resolve; sc.onerror=reject; document.head.appendChild(sc); });
+        const [{Map}]=await Promise.all([google.maps.importLibrary('maps')]);
+        nearbyMap=new Map($('#nearbyMap'),{center:{lat:28.6139,lng:77.2090},zoom:13,mapTypeControl:false,streetViewControl:false,fullscreenControl:true});
+        mapsReady=true; $('#mapStatus').textContent='Ready. Select a place to route.'; return true;
+      }catch(e){ $('#mapStatus').textContent='Google Maps could not load. Check the API key and enabled APIs.'; return false; }
+    }
+    async function searchNearbyPlaces(){
+      const ok=await loadGoogleMaps(); if(!ok) return;
+      if(!navigator.geolocation){ $('#mapStatus').textContent='Location is unavailable in this browser.'; return; }
+      $('#mapStatus').textContent='Requesting your location…';
+      navigator.geolocation.getCurrentPosition(async pos=>{
+        nearbyOrigin={lat:pos.coords.latitude,lng:pos.coords.longitude}; nearbyMap.setCenter(nearbyOrigin); nearbyMap.setZoom(14);
+        try{
+          const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
+          const type=$('#nearbyType').value;
+          const request={fields:['displayName','location','formattedAddress','googleMapsURI'],locationRestriction:{center:nearbyOrigin,radius:5000},includedPrimaryTypes:[type],maxResultCount:8,rankPreference:SearchNearbyRankPreference.DISTANCE,language:'en',region:'IN'};
+          const {places}=await Place.searchNearby(request);
+          nearbyMarkers.forEach(m=>m.setMap?.(null)); nearbyMarkers=[];
+          if(!places?.length){ $('#nearbyPlaces').innerHTML='<div class="empty-state">No matching places were found within 5 km.</div>'; $('#mapStatus').textContent='No places found nearby.'; return; }
+          const {AdvancedMarkerElement}=await google.maps.importLibrary('marker');
+          const bounds=new google.maps.LatLngBounds();
+          $('#nearbyPlaces').innerHTML=places.map((pl,i)=>`<article class="nearby-place"><div><strong>${escHtml(pl.displayName||'Nearby place')}</strong><small>${escHtml(pl.formattedAddress||'')}</small></div><div class="nearby-actions"><button class="btn small route-place" data-index="${i}">Route</button><a class="btn small" target="_blank" rel="noopener" href="${escHtml(pl.googleMapsURI||'#')}">Open map</a></div></article>`).join('');
+          places.forEach((pl,i)=>{ if(!pl.location)return; bounds.extend(pl.location); const m=new AdvancedMarkerElement({map:nearbyMap,position:pl.location,title:pl.displayName||'Nearby place'}); nearbyMarkers.push(m); }); nearbyMap.fitBounds(bounds);
+          $$('.route-place',$('#nearbyPlaces')).forEach(btn=>btn.addEventListener('click',()=>routeToPlace(places[Number(btn.dataset.index)])));
+          $('#mapStatus').textContent=`Found ${places.length} nearby places.`;
+        }catch(e){ $('#mapStatus').textContent='Nearby search failed. Check that Places API (New) is enabled.'; }
+      },()=>{ $('#mapStatus').textContent='Location permission was not granted. You can still use Open map links after searching manually.'; },{enableHighAccuracy:true,timeout:10000,maximumAge:300000});
+    }
+    async function routeToPlace(place){
+      if(!nearbyOrigin||!place?.location) return;
+      try{
+        const {Route}=await google.maps.importLibrary('routes');
+        const result=await Route.computeRoutes({origin:nearbyOrigin,destination:place.location,travelMode:'WALK',fields:['path','distanceMeters','duration']});
+        const route=result?.routes?.[0];
+        if(route?.path){ const line=new google.maps.Polyline({map:nearbyMap,path:route.path,strokeOpacity:.9,strokeWeight:5}); window._smRoute=line; }
+        const km=route?.distanceMeters?`${(route.distanceMeters/1000).toFixed(1)} km`:''; const min=route?.duration?`${Math.round(parseFloat(route.duration)/60)} min`:''; $('#mapStatus').textContent=`Walking route to ${place.displayName||'place'} · ${km} · ${min}`;
+      }catch(e){ const dest=place.googleMapsURI||`https://www.google.com/maps/dir/?api=1&origin=${nearbyOrigin.lat},${nearbyOrigin.lng}&destination=${encodeURIComponent(place.formattedAddress||place.displayName||'')}&travelmode=walking`; window.open(dest,'_blank','noopener'); $('#mapStatus').textContent='Opened Google Maps for the walking route.'; }
+    }
+    $('#findNearbyPlaces')?.addEventListener('click',searchNearbyPlaces);
+    $('#nearbyType')?.addEventListener('change',()=>{ if(nearbyOrigin) searchNearbyPlaces(); });
+
+    async function loadLiveData() {
+      try {
+        const analytics = await api('/api/dashboard');
+        updateAnalytics(analytics);
+        updateOverview(analytics);
+        await loadPersonnel(analytics.personnel || []);
+        state.model = await api('/api/evaluation').catch(()=>null);
+        if(state.model){ $('#modelFooter').textContent=`Random Forest · ${state.model.samples || state.model.sample_size || 'demo'} training records · human review required.`; }
+      } catch (error) { console.info('StressMitra live data unavailable:', error.message); toast(error.message,'shield'); }
+    }
+
+    function toast(message, icon='check') {
+      const item = document.createElement('div'); item.className='toast'; item.innerHTML=`${icons[icon] || icons.check}<span>${message}</span>`;
+      $('#toastRegion').append(item); setTimeout(()=>item.remove(), 3800);
+    }
+    function navigate(view) {
+      const viewEl = $('#'+view); if (!viewEl) return;
+      $$('.tab-view').forEach(el=>el.classList.toggle('active',el.id===view));
+      $$('.nav-item[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
+      $('#crumbTitle').textContent = ({overview:'Command centre',personnel:'Personnel overview',alerts:'Welfare alerts',recommendations:'Recovery companion',music:'Music & Jamendo',checkin:'Daily check-in',puzzle:'Calm puzzle'})[view];
+      state.currentView=view; $('#sidebar').classList.remove('open'); window.scrollTo({top:0,behavior:'smooth'});
+      if(view==='music' && !jamendoLoaded){ jamendoLoaded=true; searchJamendo(recommendationCategory()); }
+    }
+    $$('.nav-item[data-view]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.view)));
+    $$('[data-view-jump]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.viewJump)));
+    $('#menuToggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+
+    function modal(title, intro, content) { $('#modalTitle').textContent=title; $('#modalIntro').textContent=intro; $('#modalContent').innerHTML=content; $('#modalBackdrop').classList.add('open'); $('#modalBackdrop').setAttribute('aria-hidden','false'); $('#modalClose').focus(); }
+    function closeModal(){ $('#modalBackdrop').classList.remove('open'); $('#modalBackdrop').setAttribute('aria-hidden','true'); }
+    $('#modalClose').addEventListener('click',closeModal); $('#modalBackdrop').addEventListener('click',e=>{if(e.target===$('#modalBackdrop')) closeModal()}); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+    function openAuth(mode='signin', portal=state.portal||'personnel'){
+      state.portal=portal;
+      $('#siteIntro').style.display='none'; $('#authPortal').classList.add('open'); showAuthForm(mode);
+      const welfare=portal==='welfare';
+      $('#authPortalLabel').textContent=welfare?'Welfare officer portal · secure local access':'Personnel portal · secure local access';
+      $('#signInTitle').textContent=welfare?'Welfare team sign in':'Welcome back';
+      $('#signInIntro').textContent=welfare?'Use an authorised welfare, commander or admin account to enter the support workspace.':'Sign in to continue to your protected StressMitra workspace.';
+      $('#createAccountForm').style.display=welfare?'none':'';
+      if(welfare) showAuthForm('signin');
+    }
+    $('#introSignIn').addEventListener('click',()=>openAuth('signin','personnel'));
+    $('#introWelfare').addEventListener('click',()=>openAuth('signin','welfare'));
+    $('#introRegister').addEventListener('click',()=>openAuth('create','personnel'));
+    function setMusicForWellbeing(score){ state.latestWellness=score; const idx = score >= 67 ? 3 : score >= 45 ? 1 : 0; state.musicIndex=idx; if($('#healthAudioHub')) syncHubMusic(idx); const track=state.musicTracks[idx]; $('#healthAudio').src=track.file; $('#playerTitle').textContent=track.name; $('#playerReason').textContent=track.reason; $('#musicTitle').textContent=track.name; $('#musicDesc').textContent='Original instrumental audio selected from the current wellbeing signal.'; }
+    function syncHubMusic(index){
+      const track=state.musicTracks[(index+state.musicTracks.length)%state.musicTracks.length];
+      const audio=$('#healthAudioHub'); if(!audio) return;
+      state.musicIndex=(index+state.musicTracks.length)%state.musicTracks.length; audio.src=track.file;
+      $('#playerTitleHub').textContent=track.name; $('#playerReasonHub').textContent=track.reason; $('#musicHubReason').textContent='Recommended from the current wellbeing signal. You can change it anytime.';
+    }
+    function updateHubPlayer(){ const audio=$('#healthAudioHub'); if(!audio) return; const pct=audio.duration?(audio.currentTime/audio.duration)*100:0; $('#playerProgressHub').style.width=`${pct}%`; $('#playerTimeHub').textContent=`${Math.floor(audio.currentTime/60)}:${String(Math.floor(audio.currentTime%60)).padStart(2,'0')} / ${audio.duration&&isFinite(audio.duration)?`${Math.floor(audio.duration/60)}:${String(Math.floor(audio.duration%60)).padStart(2,'0')}`:'0:20'}`; }
+    function chooseHubMusic(index){ syncHubMusic(index); const audio=$('#healthAudioHub'); audio.play().then(()=>{$('#playIconHub').innerHTML='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';}).catch(()=>{}); }
+    $('#playerPlayHub')?.addEventListener('click',()=>{const audio=$('#healthAudioHub'); if(!audio.src) syncHubMusic(state.musicIndex); if(audio.paused){audio.play().then(()=>$('#playIconHub').innerHTML='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>');}else{audio.pause();$('#playIconHub').innerHTML='<path d="M8 5v14l11-7z"/>';}});
+    $('#playerPrevHub')?.addEventListener('click',()=>chooseHubMusic(state.musicIndex-1)); $('#playerNextHub')?.addEventListener('click',()=>chooseHubMusic(state.musicIndex+1));
+    $('#healthAudioHub')?.addEventListener('timeupdate',updateHubPlayer); $('#healthAudioHub')?.addEventListener('loadedmetadata',updateHubPlayer); $('#healthAudioHub')?.addEventListener('ended',()=>chooseHubMusic(state.musicIndex+1));
+
+    function updatePlayer(){ const audio=$('#healthAudio'); if(!audio) return; const pct=audio.duration ? (audio.currentTime/audio.duration)*100 : 0; $('#playerProgress').style.width=`${pct}%`; $('#playerTime').textContent=`${Math.floor(audio.currentTime/60)}:${String(Math.floor(audio.currentTime%60)).padStart(2,'0')} / ${audio.duration && isFinite(audio.duration) ? `${Math.floor(audio.duration/60)}:${String(Math.floor(audio.duration%60)).padStart(2,'0')}` : '0:20'}`; }
+    function chooseMusic(index){ state.musicIndex=(index+state.musicTracks.length)%state.musicTracks.length; const track=state.musicTracks[state.musicIndex]; const audio=$('#healthAudio'); audio.src=track.file; $('#playerTitle').textContent=track.name; $('#playerReason').textContent=track.reason; audio.play().then(()=>{state.music=true; $('#playIcon').innerHTML='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';}).catch(()=>{}); }
+    $('#playerPlay').addEventListener('click',()=>{const audio=$('#healthAudio'); if(!audio.src) chooseMusic(state.musicIndex); else if(audio.paused){audio.play().then(()=>{state.music=true; $('#playIcon').innerHTML='<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';});}else{audio.pause();state.music=false;$('#playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}});
+    $('#playerPrev').addEventListener('click',()=>chooseMusic(state.musicIndex-1)); $('#playerNext').addEventListener('click',()=>chooseMusic(state.musicIndex+1));
+    $('#healthAudio').addEventListener('timeupdate',updatePlayer); $('#healthAudio').addEventListener('loadedmetadata',updatePlayer); $('#healthAudio').addEventListener('ended',()=>chooseMusic(state.musicIndex+1)); $('#healthAudio').addEventListener('error',()=>toast('Audio could not be loaded. Restart StressMitra and try again.')); 
+    function showAuthForm(name) { $$('.auth-tab').forEach(tab=>{const active=tab.dataset.authTab===name;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',active);}); $$('.auth-form').forEach(form=>form.classList.toggle('active',form.dataset.authForm===name)); }
+    function activateAccount(payload) { state.session=payload.token; state.account=payload.account || payload.user; state.portal=payload.portal || (state.account.role==='personnel'?'personnel':'welfare'); localStorage.setItem('stressmitra_session',payload.token); const words=payload.account.name.replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/); const initials=words.slice(-2).map(word=>word[0]).join('').toUpperCase() || 'SM'; $('#operatorInitials').textContent=initials; $('#operatorName').textContent=payload.account.name; $('#operatorRole').textContent=`${payload.account.role} · ${payload.account.unit}`; $('#authPortal').classList.remove('open'); $('#siteIntro').style.display='none'; $('#appShell').style.display='grid'; document.body.classList.toggle('welfare-mode', state.portal==='welfare'); toast(`Welcome to StressMitra, ${payload.account.name}.`, 'shield'); loadLiveData(); }
+    $$('.auth-tab').forEach(tab=>tab.addEventListener('click',()=>showAuthForm(tab.dataset.authTab)));
+    $('#signInForm').addEventListener('submit',async event=>{ event.preventDefault(); const error=$('#signInError'); error.textContent=''; try { const response=await api('/api/auth/login',{method:'POST',body:JSON.stringify({username:$('#signInEmail').value,password:$('#signInPassword').value,portal:state.portal})}); activateAccount(response); } catch (problem) { error.textContent=problem.message || 'Unable to sign in.'; } });
+    $('#createAccountForm').addEventListener('submit',async event=>{ event.preventDefault(); const error=$('#createError'); error.textContent=''; try { const response=await api('/api/auth/register',{method:'POST',body:JSON.stringify({username:$('#createEmail').value,full_name:$('#createName').value,unit:$('#createUnit').value,password:$('#createPassword').value})}); activateAccount(response); } catch (problem) { error.textContent=problem.message || 'Unable to create account.'; } });
+    async function waitForGoogle(){ for(let i=0;i<60;i++){ if(window.google?.accounts?.id) return true; await new Promise(r=>setTimeout(r,150)); } return false; }
+    async function setupGoogleButton(){
+      const error=$('#signInError');
+      const host=$('#googleSignIn');
+      try {
+        const ready=await waitForGoogle();
+        if(!ready){ throw new Error('Google Identity Services could not load. Check your internet connection and reload the page.'); }
+        let clientId=window.GOOGLE_CLIENT_ID||'';
+        if(!clientId){ try { const r=await fetch('/api/config',{cache:'no-store'}); const c=await r.json(); clientId=c.googleClientId||''; window.GOOGLE_CLIENT_ID=clientId; } catch(_) {} }
+        if(!clientId){ throw new Error('Google sign-in is not configured yet. Add your Google OAuth Web Client ID to config/google-client-id.txt, then restart StressMitra.'); }
+        window.google.accounts.id.initialize({
+          client_id:clientId,
+          ux_mode:'popup',
+          callback:async response=>{
+            try {
+              const payload=await api('/api/auth/google',{method:'POST',body:JSON.stringify({credential:response.credential})});
+              activateAccount(payload);
+            } catch(e) { error.textContent=e.message||'Google sign-in failed.'; }
+          }
+        });
+        host.innerHTML='';
+        window.google.accounts.id.renderButton(host,{type:'standard',theme:'outline',size:'large',text:'continue_with',shape:'rectangular',width:320});
+      } catch(e) {
+        host.innerHTML='<button class="google-btn" type="button" id="googleFallback"><span class="google-g">G</span> Google sign-in unavailable</button>';
+        error.textContent=e.message||'Google sign-in failed.';
+      }
+    }
+    setupGoogleButton();
+    $('#useDemo').addEventListener('click',()=>{ $('#signInEmail').value='personnel01'; $('#signInPassword').value='demo123'; $('#signInForm').requestSubmit(); });
+    $('#forgotPassword').addEventListener('click',()=>modal('Account support','For the SIH prototype, account recovery is handled by the local administrator.', `<div class="modal-section"><strong>Demo account</strong><p>Use the prototype access button for the sample account. In a production deployment, recovery would use the organisation’s verified identity provider and never expose passwords.</p></div>`));
+    $('#privacyButton').addEventListener('click',()=>modal('Privacy & safeguards','StressMitra is designed to increase access to support—not to monitor or penalise people.', `<div class="modal-section"><strong>How this prototype handles information</strong><div class="modal-list"><div class="modal-item">Individual journal notes <span>Private</span></div><div class="modal-item">Team wellbeing patterns <span>De-identified</span></div><div class="modal-item">Support alerts <span>Human review</span></div><div class="modal-item">Automated disciplinary action <span>Never</span></div></div></div>`));
+    $('#notificationButton').addEventListener('click',()=>modal('Today’s notifications','Three items are ready for your review.', `<div class="modal-section"><div class="modal-list"><div class="modal-item">Bravo recovery window opens at 09:30 <span>New</span></div><div class="modal-item">Two late rotations detected <span>Review</span></div><div class="modal-item">21 optional check-ins pending <span>FYI</span></div></div></div>`));
+    $('#alertSettings').addEventListener('click',()=>modal('Alert preferences','Configure who may see welfare prompts and how often reminders appear.', `<div class="modal-section"><strong>Current safety settings</strong><div class="modal-list"><div class="modal-item">Escalation route <span>Welfare officer</span></div><div class="modal-item">Quiet hours <span>22:00–06:00</span></div><div class="modal-item">Alert threshold <span>Human-reviewed</span></div></div></div>`));
+    $('#openModelCard').addEventListener('click',()=>{ const m=state.model; const rows=m ? `<div class="modal-item">Model <span>${m.type}</span></div><div class="modal-item">Training data <span>Synthetic demo</span></div><div class="modal-item">Model version <span>${m.version}</span></div><div class="modal-item">Training samples <span>${m.sampleSize || '—'}</span></div>` : `<div class="modal-item">Mode <span>Presentation</span></div><div class="modal-item">Data source <span>Local demo</span></div>`; modal('StressMitra model card','Transparent model information for responsible use. This score is a support prompt, never a diagnosis.', `<div class="modal-section"><strong>Early-risk model overview</strong><p>The logistic-regression model considers sleep, voluntary stress input, workload, recent rotations, recovery time, trend, and support connection. It exposes its strongest drivers for every result.</p><div class="modal-list">${rows}<div class="modal-item">Decision authority <span>Human only</span></div></div></div>`); });
+
+    function renderPersonnel(people){
+      const grid=$('#personnelGrid');
+      if(!people.length){ grid.innerHTML=''; $('#emptyRoster').style.display='block'; return; }
+      grid.innerHTML=people.map(person=>{
+        const probability=Number(person.risk_probability||0);
+        const status=person.risk_level==='High'?'attention':person.risk_level==='Medium'?'watch':'stable';
+        const label=person.risk_level==='High'?'Needs follow-up':person.risk_level==='Medium'?'Watch trend':'Stable wellbeing';
+        const score=Math.round(probability*100);
+        const safe=v=>String(v??'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+        const safeName=safe(person.full_name), safeUnit=safe(person.unit), safeRole=safe(person.role||'Personnel');
+        const initials=safeName.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'SM';
+        const last=person.last_checkin ? String(person.last_checkin).replace('T',' ').slice(0,16) : 'No check-in yet';
+        return `<article class="person-card" data-name="${safeName.toLowerCase()} ${safeUnit.toLowerCase()} ${safeRole.toLowerCase()}" data-status="${status}"><div class="person-top"><div class="mini-avatar">${initials}</div><span class="role-tag">${safeRole}</span></div><h3>${safeName}</h3><span class="unit">${safeUnit}</span><div class="card-score"><div class="score-num">${score}</div><div class="score-copy"><strong>${label}</strong>Current advisory risk signal</div></div><div class="person-meta"><span>Last check-in <b>${last}</b></span><span>Sleep <b>${person.sleep_hours ?? '—'}h</b></span></div><div class="card-actions"><button class="btn small person-detail" data-person-id="${person.id}" data-person="${safeName}">View context</button><button class="btn primary small person-support" data-person="${safeName}">Offer support</button></div></article>`;
+      }).join('');
+      $('#emptyRoster').style.display='none';
+      $('#personnelBadge').textContent=String(people.length);
+    }
+    async function loadPersonnel(peopleOverride=null){
+      try {
+        if(peopleOverride){ renderPersonnel(peopleOverride); return; }
+        const data=await api('/api/dashboard'); renderPersonnel(data.personnel||[]);
+      } catch(e){ console.info('Personnel data unavailable:',e.message); }
+    }
+
+    function filterRoster(){ const query=$('#personSearch').value.trim().toLowerCase(), filter=$('#riskFilter').value; let count=0; $$('.person-card').forEach(card=>{ const match=card.dataset.name.includes(query)&&(filter==='all'||card.dataset.status===filter); card.classList.toggle('hidden',!match); if(match)count++; }); $('#emptyRoster').style.display=count?'none':'block'; }
+    $('#personSearch').addEventListener('input',filterRoster); $('#riskFilter').addEventListener('change',filterRoster);
+    $('.personnel-grid').addEventListener('click',e=>{ const detail=e.target.closest('.person-detail'), support=e.target.closest('.person-support'); if(detail) showPerson(detail.dataset.person); if(support) offerSupport(support.dataset.person); });
+    function showPerson(person){ modal(`${person} · support context`, 'A bounded, respectful summary for a private conversation. It is not a diagnosis.', `<div class="modal-section"><strong>What the pattern suggests</strong><p>Recent rest and self-reported load indicate a possible recovery need. Ask open questions and let ${person} choose whether to accept support.</p><div class="modal-list"><div class="modal-item">Suggested opening <span>“How are you holding up?”</span></div><div class="modal-item">Optional support <span>Recovery block</span></div><div class="modal-item">Recommended follow-up <span>Tomorrow</span></div></div><button class="btn primary full" style="margin-top:14px" onclick="window.sentinelOffer('${person}')">Offer a support check-in</button></div>`); }
+    function offerSupport(person){ closeModal(); toast(`Private support check-in drafted for ${person}. They can accept, decline, or choose another time.`, 'heart'); }
+    window.sentinelOffer=offerSupport;
+    $('#exportRoster').addEventListener('click',()=>toast('Support brief prepared with de-identified trends only.','shield'));
+
+    $$('.alert-open').forEach(btn=>btn.addEventListener('click',()=>showPerson(btn.dataset.person)));
+    $$('.alert-resolve').forEach(btn=>btn.addEventListener('click',async()=>{ const card=btn.closest('.alert-card'); try { await api(`/api/alerts/${card.dataset.alert}/ack`,{method:'POST'}); } catch { /* The presentation build preserves the local acknowledgement flow. */ } card.style.opacity='.35'; card.style.transform='scale(.985)'; setTimeout(()=>{card.remove(); const n=$$('.alert-card').length; $$('.nav-badge')[1].textContent=n; if(!n)$('#emptyAlerts').style.display='block'; toast('Alert acknowledged. The support action remains human-led.');},180); }));
+    $('#sendReminder')?.addEventListener('click',()=>toast('A gentle, optional check-in reminder has been queued for 21 personnel.','heart'));
+
+    const recoOptions=[
+      {music:['Low-tempo focus flow','Instrumental textures designed for a calm transition after a high-focus shift.'],place:['Lakeside perimeter walk','A shaded, low-noise route suited to a gentle decompress with no planning overhead.'],yoga:['Shoulder & spine reset','Three accessible, uniform-friendly poses to release desk and equipment tension.']},
+      {music:['Evening downshift','Warm ambient rhythm to make the handoff from duty to personal time feel less abrupt.'],place:['Botanical garden loop','A quiet green route with bench stops for an unhurried 20-minute reset.'],yoga:['Desk recovery flow','Neck, wrist and hip mobility that fits between two briefings.']},
+      {music:['Clear-head instrumental','Soft piano and slow percussion for an uncluttered end-of-shift mental reset.'],place:['Sunset viewpoint trail','A short, familiar walk with open sightlines and low decision load.'],yoga:['Breath & balance','A calm standing sequence combining paced breathing and gentle balance.']}
+    ]; let recoIndex=0;
+    function refreshReco(){ recoIndex=(recoIndex+1)%recoOptions.length; const v=recoOptions[recoIndex]; $('#musicTitle').textContent=v.music[0]; $('#musicDesc').textContent=v.music[1]; $('#placeTitle').textContent=v.place[0]; $('#placeDesc').textContent=v.place[1]; $('#yogaTitle').textContent=v.yoga[0]; $('#yogaDesc').textContent=v.yoga[1]; toast('Fresh suggestions are ready, based on your stated preferences.'); }
+    $('#refreshReco').addEventListener('click',refreshReco);
+    $('#tuneProfile').addEventListener('click',()=>modal('Tune your recovery profile','Choose what feels practical today. These preferences stay in your personal space.', `<div class="modal-section"><strong>Preference signals</strong><div class="modal-list"><div class="modal-item">Available time <span>15–30 min</span></div><div class="modal-item">Preferred environment <span>Outdoors</span></div><div class="modal-item">Audio preference <span>Instrumental</span></div></div><button class="btn primary full" style="margin-top:14px" onclick="window.sentinelTune()">Save preferences</button></div>`));
+    window.sentinelTune=()=>{closeModal();toast('Your recovery preferences have been updated.');refreshReco()};
+    $$('.reco-action').forEach(btn=>btn.addEventListener('click',()=>{ const type=btn.dataset.type; if(type==='music'){ navigate('music'); $('#musicPlayerHub').scrollIntoView({behavior:'smooth',block:'center'}); chooseHubMusic(state.musicIndex); btn.textContent='Player open'; toast('Playing the recovery track matched to the current wellbeing state.');} if(type==='place')modal('Lakeside perimeter walk','A suggested low-noise reset route.', `<div class="modal-section"><div class="modal-list"><div class="modal-item">Distance <span>1.4 km</span></div><div class="modal-item">Estimated time <span>22 min</span></div><div class="modal-item">Best moment <span>After 18:30</span></div></div><button class="btn primary full" style="margin-top:14px" onclick="window.sentinelRoute()">Save as my reset</button></div>`); if(type==='yoga')modal('6-minute shoulder & spine reset','Move gently; stop if anything hurts or feels unsuitable.', `<div class="modal-section"><div class="modal-list"><div class="modal-item">1. Shoulder rolls <span>90 sec</span></div><div class="modal-item">2. Standing side reach <span>2 min</span></div><div class="modal-item">3. Forward fold & breathe <span>2.5 min</span></div></div><button class="btn primary full" style="margin-top:14px" onclick="window.sentinelYoga()">Start gentle timer</button></div>`); }));
+    window.sentinelRoute=()=>{closeModal();toast('Your decompression walk is saved for 18:30.');}; window.sentinelYoga=()=>{closeModal();toast('Gentle movement timer started. Take it at your pace.','heart');};
+
+    function updateRange(input, output){ output.textContent=`${input.value} / 10`; }
+    $('#energy').addEventListener('input',e=>updateRange(e.target,$('#energyValue'))); $('#load').addEventListener('input',e=>updateRange(e.target,$('#loadValue')));
+    $('#supportChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b)return; $$('.choice',$('#supportChoices')).forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.choice=b.dataset.choice;});
+    const rangeSpecs={dutyHours:['dutyHoursValue',v=>`${v} h`],sleepHours:['sleepHoursValue',v=>`${v} h`],energy:['energyValue',v=>`${v} / 10`],load:['loadValue',v=>`${v} / 10`],stressLevel:['stressLevelValue',v=>`${v} / 10`],moodLevel:['moodLevelValue',v=>`${v} / 10`],focusLevel:['focusLevelValue',v=>`${v} / 10`],nightShifts:['nightShiftsValue',v=>`${v}`],recoveryDays:['recoveryDaysValue',v=>`${v}`],socialSupport:['socialSupportValue',v=>`${v} / 10`]};
+    Object.entries(rangeSpecs).forEach(([id,[out,fmt]])=>$('#'+id)?.addEventListener('input',e=>$('#'+out).textContent=fmt(e.target.value)));
+    $('#healthReport')?.addEventListener('change',e=>{const f=e.target.files?.[0]; $('#reportFile').textContent=f ? `${f.name} · ${(f.size/1024/1024).toFixed(2)} MB` : 'No report selected.'; if(f && (!(f.name||'').toLowerCase().endsWith('.pdf') || f.size>8*1024*1024)){toast('Please choose a PDF smaller than 8 MB.'); e.target.value=''; $('#reportFile').textContent='No report selected.';}});
+    async function uploadHealthReport(){ const f=$('#healthReport')?.files?.[0]; if(!f)return null; if(f.type!=='application/pdf'||f.size>8*1024*1024) throw new Error('Health report must be a PDF smaller than 8 MB.'); const buf=await f.arrayBuffer(); const r=await fetch('/api/health-report',{method:'POST',headers:{'Content-Type':'application/pdf','X-Filename':encodeURIComponent(f.name),'Authorization':`Bearer ${state.session}`},body:buf}); const data=await r.json(); if(!r.ok) throw new Error(data.error||'Health report upload failed.'); return data; }
+    const puzzleSymbols=['◐','✦','☁','☀','◈','✿','♢','≈'];
+    let puzzleState={cards:[],first:null,lock:false,moves:0,pairs:0};
+    function newPuzzle(){
+      const cards=[...puzzleSymbols,...puzzleSymbols].sort(()=>Math.random()-.5);
+      puzzleState={cards,first:null,lock:false,moves:0,pairs:0};
+      const board=$('#puzzleBoard'); if(!board)return;
+      $('#puzzleMoves').textContent='0'; $('#puzzlePairs').textContent='0/8';
+      board.innerHTML=cards.map((sym,i)=>`<button type="button" class="puzzle-tile" data-index="${i}" aria-label="Hidden puzzle tile"><span aria-hidden="true">?</span></button>`).join('');
+    }
+    window.newPuzzle=newPuzzle;
+    $('#puzzleBoard')?.addEventListener('click',e=>{
+      const tile=e.target.closest('.puzzle-tile');
+      if(!tile||puzzleState.lock||tile.classList.contains('flipped')||tile.classList.contains('matched'))return;
+      const i=Number(tile.dataset.index); if(!Number.isInteger(i))return;
+      tile.textContent=puzzleState.cards[i]; tile.classList.add('flipped');
+      if(puzzleState.first===null){puzzleState.first=i;return;}
+      const first=puzzleState.first; puzzleState.moves++; $('#puzzleMoves').textContent=puzzleState.moves;
+      if(puzzleState.cards[first]===puzzleState.cards[i]){
+        [first,i].forEach(idx=>document.querySelector(`.puzzle-tile[data-index="${idx}"]`)?.classList.add('matched'));
+        puzzleState.pairs++; $('#puzzlePairs').textContent=`${puzzleState.pairs}/8`; puzzleState.first=null;
+        if(puzzleState.pairs===8)toast(`Puzzle complete in ${puzzleState.moves} moves. Nice reset.`,'heart');
+      } else {
+        puzzleState.lock=true;
+        setTimeout(()=>{[first,i].forEach(idx=>{const x=document.querySelector(`.puzzle-tile[data-index="${idx}"]`);if(x){x.classList.remove('flipped');x.innerHTML='<span aria-hidden="true">?</span>';}});puzzleState.first=null;puzzleState.lock=false;},700);
+      }
+    });
+    $('#newPuzzle')?.addEventListener('click',newPuzzle);
+    newPuzzle();
+    $('#checkinForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const submit=e.submitter||$('#checkinForm button[type="submit"]'); if(submit){submit.disabled=true;submit.textContent='Saving check-in…';}
+      const dutyHours=+$('#dutyHours').value, sleepHours=+$('#sleepHours').value, energy=+$('#energy').value, manageability=+$('#load').value, stressLevel=+$('#stressLevel').value, mood=+$('#moodLevel').value, focus=+$('#focusLevel').value, nightShifts=+$('#nightShifts').value, recoveryDays=+$('#recoveryDays').value, socialSupport=+$('#socialSupport').value;
+      const fatigue=Math.max(0,Math.min(10,10-energy)); const recoveryGap=Math.max(0,Math.min(30,7-recoveryDays));
+      const workload=Math.max(1,Math.min(10,Math.round((manageability+dutyHours/1.6)/2)));
+      const f=$('#healthReport')?.files?.[0];
+      if(!state.session){ if(submit){submit.disabled=false;submit.textContent='Submit check-in';} openAuth('signin'); $('#signInError').textContent='Please sign in before submitting your private check-in.'; return; }
+      if(f && (!(f.name||'').toLowerCase().endsWith('.pdf') || f.size>8*1024*1024)){toast('Please choose a PDF smaller than 8 MB.'); if(submit){submit.disabled=false;submit.textContent='Submit check-in';} return;}
+      try{
+        const fd=new FormData();
+        fd.append('duty_hours',dutyHours); fd.append('sleep_hours',sleepHours); fd.append('fatigue',fatigue); fd.append('mood',mood); fd.append('focus',focus); fd.append('social_support',socialSupport); fd.append('recovery_gap',recoveryGap); fd.append('workload',workload);
+        fd.append('night_shifts_7d',nightShifts); fd.append('recovery_days_7d',recoveryDays); fd.append('supportNeed',state.choice); fd.append('note',$('#note').value);
+        fd.append('duty_location',$('#dutyLocation')?.value||''); fd.append('last_trip',$('#lastTrip')?.value||'');
+        if(f) fd.append('health_report',f,f.name);
+        const response=await fetch('/api/checkins-with-report',{method:'POST',headers:{'Authorization':`Bearer ${state.session}`},body:fd});
+        const data=await response.json().catch(()=>({}));
+        if(response.status===401){throw new Error('AUTH_EXPIRED');}
+        if(!response.ok) throw new Error(data.detail||data.error||`Check-in failed (${response.status})`);
+        const riskScore=data.prediction?.riskScore ?? Math.round(Number(data.risk_probability||0)*100); const wellness=100-riskScore;
+        if(data.recommendations){setMusicForWellbeing(wellness);$('#placeTitle').textContent=data.recommendations.place;$('#yogaTitle').textContent=data.recommendations.yoga;$('#targetDuty').textContent=data.recommendations.targetDutyHours;$('#targetSleep').textContent=data.recommendations.targetSleepHours;$('#targetWorkload').textContent=data.recommendations.targetWorkload;
+          const spots=data.recommendations.vacationSpots||[]; const vList=$('#vacationList');
+          if(vList){ vList.innerHTML = spots.map(s=>`<li><b>${s.name}</b>${s.blurb}</li>`).join(''); }
+          if(spots.length){ $('#vacationTitle').textContent = spots[0].name; $('#vacationDesc').textContent = spots[0].blurb; }
+          else { $('#vacationTitle').textContent = 'Add your duty location for tailored ideas'; $('#vacationDesc').textContent = "Suggested family getaways will appear here based on where you're posted and where you last went."; }
+          $('#vacationNote').textContent = data.recommendations.vacationNote || '';
+          const breathing=data.recommendations.breathing;
+          if(breathing?.primary){ $('#breathingTitle').textContent=breathing.primary.name; $('#breathingDesc').textContent=breathing.primary.steps;
+            const alts=(breathing.alternates||[]).map(a=>a.name).join(' · ');
+            $('#breathingAlt').textContent = alts ? `Also try: ${alts}` : 'More options appear after your next check-in';
+          }
+        }
+        toast(data.report?`Check-in saved and PDF report received for authorised review.`:`Check-in saved. Your advisory support result is ready.`,'heart');
+        $('#myScore').textContent=wellness; const ring=$('.ring'); if(ring)ring.style.background=`conic-gradient(var(--teal) 0deg ${wellness*3.6}deg,rgba(219,245,240,.1) ${wellness*3.6}deg)`;
+        $('#note').value=''; if($('#healthReport'))$('#healthReport').value=''; $('#reportFile').textContent='No report selected.'; await loadLiveData(); navigate('overview');
+      }catch(problem){
+        if(problem.message==='AUTH_EXPIRED'){state.session=null;state.account=null;localStorage.removeItem('stressmitra_session');openAuth('signin');$('#signInError').textContent='Your session expired. Please sign in again to submit this private check-in.';}
+        else toast(problem.message||'Could not save the check-in. Please try again.');
+      }finally{if(submit){submit.disabled=false;submit.textContent='Submit check-in';}}
+    });
+    $('#skipCheckin').addEventListener('click',()=>{toast('Private draft saved on this device. You can return whenever you are ready.');});
+    $$('.support-link').forEach(btn=>btn.addEventListener('click',()=>toast(`${btn.dataset.support} request started. In a real deployment this connects to the approved support channel.`, 'heart')));
+    (async()=>{ if(!state.session) return; try { const session=await api('/api/auth/me'); state.account=session.user; const words=session.user.full_name.replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/); const initials=words.slice(-2).map(word=>word[0]).join('').toUpperCase() || 'SM'; $('#operatorInitials').textContent=initials; $('#operatorName').textContent=session.user.full_name; $('#operatorRole').textContent=`${session.user.role} · ${session.user.unit}`; $('#siteIntro').style.display='none'; state.portal=session.user.role==='personnel'?'personnel':'welfare'; document.body.classList.toggle('welfare-mode', state.portal==='welfare'); $('#appShell').style.display='grid'; loadLiveData(); } catch { state.session=null; localStorage.removeItem('stressmitra_session'); } })();
+    setMusicForWellbeing(31);
+  
+
+    function setJamendoPlayerHub(track){
+      const player=$('#jamendoPlayerHub'), audio=$('#jamendoAudioHub'), title=$('#jamendoNowPlayingHub'), open=$('#jamendoOpenCurrentHub'), license=$('#jamendoLicenseHub');
+      if(!track?.audio){ if(player) player.style.display='none'; return; }
+      player.style.display='block'; title.textContent=`${track.name} · ${track.artist}`; audio.src=track.audio; audio.load(); open.href=track.url||'#';
+      if(license) license.textContent=track.license ? `License information · ${track.license}` : 'Jamendo catalog track';
+    }
+    function recommendationCategory(){
+      const latest=state.latestWellness ?? null;
+      if(latest==null) return 'Calm';
+      return latest>=67 ? 'Calm' : latest>=45 ? 'Focus' : 'Energetic';
+    }
+    function syncJamendoTrackDropdown(tracks){
+      const select=$('#jamendoTrackSelect'); if(!select) return;
+      select.innerHTML=tracks.length ? tracks.map((t,i)=>`<option value="${i}">${escHtml(t.name)} — ${escHtml(t.artist)}</option>`).join('') : '<option value="">No songs found</option>';
+      if(tracks.length) setJamendoPlayerHub(tracks[0]);
+    }
+    async function searchJamendo(category='Calm'){
+      const select=$('#jamendoTrackSelect');
+      if(select) select.innerHTML='<option value="">Searching Jamendo…</option>';
+      try{
+        const data=await api('/api/jamendo/search?category='+encodeURIComponent(category));
+        const tracks=data.tracks||[]; window._jamendoTracks=tracks; syncJamendoTrackDropdown(tracks);
+      }catch(err){
+        if(select) select.innerHTML='<option value="">Jamendo is unavailable</option>';
+        $('#jamendoPlayerHub').style.display='none'; toast(err.message||'Jamendo search is unavailable.');
+      }
+    }
+    let jamendoLoaded=false;
+    $('#jamendoMoodSelect')?.addEventListener('change', async e=>{
+      const value=e.target.value;
+      const category=value==='recommended' ? recommendationCategory() : value;
+      jamendoLoaded=true; await searchJamendo(category);
+    });
+    $('#jamendoTrackSelect')?.addEventListener('change', e=>{
+      const track=window._jamendoTracks?.[Number(e.target.value)]; if(track) setJamendoPlayerHub(track);
+    });
+    async function openJamendoSection(){
+      navigate('music');
+      const mood=$('#jamendoMoodSelect');
+      if(mood && mood.value==='recommended'){ mood.dataset.loaded='1'; }
+      if(!jamendoLoaded){ jamendoLoaded=true; await searchJamendo(recommendationCategory()); }
+      setTimeout(()=>$('#jamendoPlayerHub')?.scrollIntoView({behavior:'smooth',block:'center'}),80);
+    }
+
+    $('#overviewJamendo')?.addEventListener('click',openJamendoSection);
+
+    function addAiMessage(text, role='bot'){ const box=$('#aiMessages'); const el=document.createElement('div'); el.className=`ai-msg ${role}`; el.textContent=text; box.appendChild(el); box.scrollTop=box.scrollHeight; }
+    async function sendAiMessage(message){ if(!message.trim()) return; addAiMessage(message,'user'); $('#aiInput').value=''; try{ const data=await api('/api/assistant/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})}); addAiMessage(data.reply||'I could not generate a response.'); }catch(e){ addAiMessage(e.message||'The assistant is unavailable.'); } }
+    $('#aiFab')?.addEventListener('click',()=>$('#aiChat').classList.toggle('open'));
+    $('#aiChatClose')?.addEventListener('click',()=>$('#aiChat').classList.remove('open'));
+    $('#aiForm')?.addEventListener('submit',e=>{e.preventDefault();sendAiMessage($('#aiInput').value);});
+    $$('[data-ai-q]').forEach(b=>b.addEventListener('click',()=>sendAiMessage(b.dataset.aiQ)));
+</script>
+</body>
+</html>

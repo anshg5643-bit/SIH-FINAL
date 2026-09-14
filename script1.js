@@ -1,0 +1,1 @@
+fetch("/api/config").then(r=>r.json()).then(c=>window.GOOGLE_CLIENT_ID=c.googleClientId||"").catch(()=>{});

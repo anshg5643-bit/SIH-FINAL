@@ -1,0 +1,5 @@
+# Virtual environment
+.venv/
+
+# Configuration files and secrets
+config/

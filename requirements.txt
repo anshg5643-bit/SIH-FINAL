@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+numpy
+scikit-learn
+joblib
+passlib[bcrypt]
+reportlab
+
+groq
